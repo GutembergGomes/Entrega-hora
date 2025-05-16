@@ -521,27 +521,11 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="drawer-link flex items-center p-3 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" data-page="planejamento">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                </svg>
-                                Planejamento
-                            </a>
-                        </li>
-                        <li>
                             <a href="#" class="drawer-link flex items-center p-3 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" data-page="metas">
                                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 Metas e Desempenho
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="drawer-link flex items-center p-3 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" data-page="historico">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Histórico
                             </a>
                         </li>
                         <li>
@@ -555,29 +539,6 @@
                         </li>
                     </ul>
                 </nav>
-                
-                <!-- Weather and current date -->
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Previsão Local</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400" id="weather-location">Carregando...</div>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                        <div class="flex items-center">
-                            <div id="weather-icon" class="w-10 h-10 mr-2 weather-icon">
-                                <!-- Weather icon will be inserted here -->
-                            </div>
-                            <div>
-                                <div id="weather-temp" class="font-bold">--°C</div>
-                                <div id="weather-desc" class="text-xs text-gray-600 dark:text-gray-300">Carregando...</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div id="current-date" class="text-sm font-medium"></div>
-                            <div id="current-time" class="text-xs text-gray-600 dark:text-gray-300"></div>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- User section -->
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
@@ -799,19 +760,6 @@
                                                     </div>
                                                 </div>
                                             </a>
-                                            <a href="#" class="block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-500 dark:text-purple-300">
-                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                                        </svg>
-                                                    </div>
-                                                    <div class="ml-3">
-                                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Planejamento Semanal</p>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Planejamento > Semana 36</p>
-                                                    </div>
-                                                </div>
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -999,8 +947,25 @@
                             </div>
                         </div>
                         
-                        <!-- Performance Metrics and Weather Impact -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Dashboard Trips and Trucks per Hour -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Viagens por Frente</h3>
+                                <div class="h-80">
+                                    <canvas id="tripsByFrontChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Média de Caminhões/Hora por Frente</h3>
+                                <div class="h-80">
+                                    <canvas id="trucksPerHourChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Performance Metrics -->
+                        <div class="grid grid-cols-1 gap-6 mb-6">
                             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Métricas de Desempenho</h3>
                                 <div class="space-y-4">
@@ -1049,341 +1014,6 @@
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2">
                                         <div class="bg-primary h-2.5 rounded-full" style="width: 83%"></div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Impacto Climático</h3>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex-shrink-0 p-2 mr-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-                                            <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Precipitação</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">25mm (últimos 7 dias)</p>
-                                        </div>
-                                        <div class="ml-auto text-right">
-                                            <p class="text-sm font-medium text-red-600 dark:text-red-400">-8%</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">impacto</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex-shrink-0 p-2 mr-3 bg-yellow-100 dark:bg-yellow-900 rounded-full">
-                                            <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Temperatura</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">32°C (média)</p>
-                                        </div>
-                                        <div class="ml-auto text-right">
-                                            <p class="text-sm font-medium text-green-600 dark:text-green-400">+2%</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">impacto</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Previsão de 5 dias</h4>
-                                    <div class="grid grid-cols-5 gap-2">
-                                        <div class="text-center p-2">
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">Seg</p>
-                                            <svg class="w-8 h-8 mx-auto my-1 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                            </svg>
-                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">33°C</p>
-                                        </div>
-                                        <div class="text-center p-2">
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">Ter</p>
-                                            <svg class="w-8 h-8 mx-auto my-1 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                                            </svg>
-                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">28°C</p>
-                                        </div>
-                                        <div class="text-center p-2">
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">Qua</p>
-                                            <svg class="w-8 h-8 mx-auto my-1 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                                            </svg>
-                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">27°C</p>
-                                        </div>
-                                        <div class="text-center p-2">
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">Qui</p>
-                                            <svg class="w-8 h-8 mx-auto my-1 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                            </svg>
-                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">31°C</p>
-                                        </div>
-                                        <div class="text-center p-2">
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">Sex</p>
-                                            <svg class="w-8 h-8 mx-auto my-1 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                            </svg>
-                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">32°C</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Próximas Ações</h3>
-                                <ul class="space-y-3">
-                                    <li>
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 h-5 w-5 rounded bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-500 dark:text-red-400">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Revisar planejamento para Frente 4002</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">Eficiência abaixo de 60% - Alta prioridade</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 h-5 w-5 rounded bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-500 dark:text-yellow-400">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Monitorar período 14:00-16:00</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">Tendência de queda nas últimas 3 semanas</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 h-5 w-5 rounded bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-400">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Relatório semanal pendente</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">Prazo: amanhã às 10:00</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 h-5 w-5 rounded bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-500 dark:text-green-400">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Reunião de alinhamento</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">Quinta-feira, 15:00 - Sala de Reuniões</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-400 flex items-center">
-                                        <span>Ver todas as ações</span>
-                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Recent Activity and Achievement Section -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Atividades Recentes</h3>
-                                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-400">Ver todas</a>
-                                </div>
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead class="bg-gray-50 dark:bg-gray-700">
-                                            <tr>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Atividade</th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Usuário</th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                            <tr>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="flex-shrink-0 h-8 w-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-500 dark:text-green-400">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3">
-                                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Edição de Dados</p>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Período 12:00-14:00, Frente 4001</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-800 dark:text-blue-200 text-xs font-medium">JS</div>
-                                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">João Silva</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    Hoje, 10:42
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                        Concluído
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="flex-shrink-0 h-8 w-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-400">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3">
-                                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Geração de Relatório</p>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Relatório Semanal de Desempenho</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="h-6 w-6 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-800 dark:text-purple-200 text-xs font-medium">MC</div>
-                                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Maria Costa</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    Ontem, 16:30
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                        Concluído
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="flex-shrink-0 h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-500 dark:text-purple-400">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3">
-                                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Criação de Meta</p>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Meta mensal para Frente 4006</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="h-6 w-6 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-800 dark:text-yellow-200 text-xs font-medium">CC</div>
-                                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Carlos Cruz</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    26/07/2024, 09:15
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                                        Em Revisão
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="flex-shrink-0 h-8 w-8 rounded-md bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-500 dark:text-red-400">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3">
-                                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Alerta de Desempenho</p>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Frente 4012 abaixo da meta</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="h-6 w-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-800 dark:text-red-200 text-xs font-medium">SG</div>
-                                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Sistema</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    25/07/2024, 14:22
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                        Pendente
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Conquistas</h3>
-                                <div class="space-y-4">
-                                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-lg shadow-md">
-                                        <div class="flex justify-between items-center">
-                                            <div class="p-2 bg-white bg-opacity-20 rounded-full">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-sm font-medium text-white bg-white bg-opacity-20 px-2 py-1 rounded-full">Novo!</span>
-                                        </div>
-                                        <h4 class="text-lg font-bold mt-3">Superação de Meta</h4>
-                                        <p class="text-sm text-white text-opacity-90 mt-1">Frente 4001 superou a meta mensal</p>
-                                        <div class="mt-2 text-sm text-white text-opacity-80">25/07/2024</div>
-                                    </div>
-                                    
-                                    <div class="border border-gray-200 dark:border-gray-700 p-4 rounded-lg">
-                                        <div class="flex justify-between items-center">
-                                            <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-full text-blue-500 dark:text-blue-400">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <h4 class="text-lg font-bold mt-3 text-gray-900 dark:text-gray-100">Eficiência Superior</h4>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Eficiência acima de 90% por 3 dias consecutivos</p>
-                                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-500">20/07/2024</div>
-                                    </div>
-                                    
-                                    <div class="border border-gray-200 dark:border-gray-700 p-4 rounded-lg">
-                                        <div class="flex justify-between items-center">
-                                            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full text-green-500 dark:text-green-400">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <h4 class="text-lg font-bold mt-3 text-gray-900 dark:text-gray-100">Recordista</h4>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Maior volume de entrega em um único período</p>
-                                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-500">15/07/2024</div>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-400 flex items-center">
-                                        <span>Ver todas as conquistas</span>
-                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1470,19 +1100,6 @@
                         </div>
                     </div>
                     
-                    <!-- Planejamento Content -->
-                    <div id="planejamento-content" class="page-content hidden">
-                        <div class="text-center py-10">
-                            <div class="inline-block p-6 bg-primary/10 dark:bg-primary/20 rounded-lg">
-                                <svg class="w-16 h-16 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                </svg>
-                                <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Planejamento</h2>
-                                <p class="mt-2 text-gray-600 dark:text-gray-400">Página em desenvolvimento. Ferramentas de planejamento estarão disponíveis em breve.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Metas Content -->
                     <div id="metas-content" class="page-content hidden">
                         <div class="text-center py-10">
@@ -1492,19 +1109,6 @@
                                 </svg>
                                 <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Metas e Desempenho</h2>
                                 <p class="mt-2 text-gray-600 dark:text-gray-400">Página em desenvolvimento. Acompanhamento de metas e desempenho estarão disponíveis em breve.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Histórico Content -->
-                    <div id="historico-content" class="page-content hidden">
-                        <div class="text-center py-10">
-                            <div class="inline-block p-6 bg-primary/10 dark:bg-primary/20 rounded-lg">
-                                <svg class="w-16 h-16 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Histórico</h2>
-                                <p class="mt-2 text-gray-600 dark:text-gray-400">Página em desenvolvimento. Histórico de dados estará disponível em breve.</p>
                             </div>
                         </div>
                     </div>
@@ -1862,7 +1466,9 @@
                 efficiencyGauge: null,
                 periodComparison: null,
                 deliveryByPeriod: null,
-                frontPerformance: null
+                frontPerformance: null,
+                tripsByFront: null, // New chart for trips by front
+                trucksPerHour: null // New chart for trucks per hour
             },
             
             // Current active period
@@ -1885,14 +1491,6 @@
                 endDate: null,
                 currentMonth: new Date().getMonth(),
                 currentYear: new Date().getFullYear()
-            },
-            
-            // Weather data (mock)
-            weather: {
-                location: "Campo Grande, MS",
-                temperature: 32,
-                description: "Ensolarado",
-                icon: "sun"
             },
             
             // History
@@ -1928,6 +1526,20 @@
                     datasets: [
                         { label: "Eficiência", data: [85, 72, 91, 68, 76, 82] }
                     ]
+                },
+                // New analytics data for trips by front
+                tripsByFront: {
+                    labels: ["F4001", "F4002", "F4007", "F4009"],
+                    datasets: [
+                        { label: "Viagens", data: [250, 320, 180, 275] }
+                    ]
+                },
+                // New analytics data for trucks per hour
+                trucksPerHour: {
+                    labels: ["F4001", "F4002", "F4007", "F4009"],
+                    datasets: [
+                        { label: "Caminhões/Hora", data: [5.2, 6.7, 3.8, 5.7] }
+                    ]
                 }
             }
         };
@@ -1943,8 +1555,6 @@
             calculateDelivery();
             calculateTwoHourTotals();
             initializeCharts();
-            updateWeatherWidget();
-            setupKeyboardShortcuts();
             updateDateTimeWidgets();
             
             // Set up auto-save interval
@@ -2318,46 +1928,13 @@
         // Update Date/Time Widgets
         function updateDateTimeWidgets() {
             const headerDate = document.getElementById('header-date');
-            const currentDate = document.getElementById('current-date');
-            const currentTime = document.getElementById('current-time');
             
             const now = new Date();
             const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit' };
             
             const formattedDate = now.toLocaleDateString('pt-BR', dateOptions);
-            const formattedTime = now.toLocaleTimeString('pt-BR', timeOptions);
             
             if (headerDate) headerDate.textContent = formattedDate;
-            if (currentDate) currentDate.textContent = formattedDate;
-            if (currentTime) currentTime.textContent = formattedTime;
-        }
-        
-        // Update Weather Widget
-        function updateWeatherWidget() {
-            // In a real app, this would fetch data from a weather API
-            // For this example, we'll use mock data
-            const weatherIcons = {
-                'sun': `<svg class="w-10 h-10 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>`,
-                'cloud': `<svg class="w-10 h-10 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                        </svg>`,
-                'rain': `<svg class="w-10 h-10 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                        </svg>`
-            };
-            
-            const weatherLocation = document.getElementById('weather-location');
-            const weatherTemp = document.getElementById('weather-temp');
-            const weatherDesc = document.getElementById('weather-desc');
-            const weatherIcon = document.getElementById('weather-icon');
-            
-            if (weatherLocation) weatherLocation.textContent = state.weather.location;
-            if (weatherTemp) weatherTemp.textContent = `${state.weather.temperature}°C`;
-            if (weatherDesc) weatherDesc.textContent = state.weather.description;
-            if (weatherIcon) weatherIcon.innerHTML = weatherIcons[state.weather.icon] || '';
         }
         
         // Setup Keyboard Shortcuts
@@ -2386,7 +1963,7 @@
                 // Alt + 1-7 for navigation
                 if (e.altKey && !isNaN(parseInt(e.key)) && parseInt(e.key) >= 1 && parseInt(e.key) <= 7) {
                     e.preventDefault();
-                    const pages = ['dashboard', 'entrega-hora', 'relatorios', 'planejamento', 'metas', 'historico', 'configuracoes'];
+                    const pages = ['dashboard', 'entrega-hora', 'relatorios', 'metas', 'configuracoes'];
                     const index = parseInt(e.key) - 1;
                     
                     if (index < pages.length) {
@@ -2506,17 +2083,9 @@
                         pageTitle.textContent = 'Análises e Relatórios';
                         pageSubtitle.textContent = 'Relatórios detalhados e análises de desempenho';
                         break;
-                    case 'planejamento':
-                        pageTitle.textContent = 'Planejamento';
-                        pageSubtitle.textContent = 'Planeje metas e objetivos futuros';
-                        break;
                     case 'metas':
                         pageTitle.textContent = 'Metas e Desempenho';
                         pageSubtitle.textContent = 'Acompanhe o progresso das metas estabelecidas';
-                        break;
-                    case 'historico':
-                        pageTitle.textContent = 'Histórico';
-                        pageSubtitle.textContent = 'Consulte dados históricos e tendências';
                         break;
                     case 'configuracoes':
                         pageTitle.textContent = 'Configurações';
@@ -3501,6 +3070,132 @@
                 });
             }
             
+            // NEW: Trips by Front Chart
+            const tripsByFrontCtx = document.getElementById('tripsByFrontChart')?.getContext('2d');
+            if (tripsByFrontCtx) {
+                const frontLabels = state.analytics.tripsByFront.labels;
+                const tripsData = state.analytics.tripsByFront.datasets[0].data;
+                
+                state.charts.tripsByFront = new Chart(tripsByFrontCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: frontLabels,
+                        datasets: [
+                            {
+                                label: 'Viagens Entregues',
+                                data: tripsData,
+                                backgroundColor: 'rgba(14, 165, 233, 0.7)', // Sky blue color
+                                borderColor: 'rgba(14, 165, 233, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Número de Viagens'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Viagens: ${context.raw}`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                display: false
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: (value) => value,
+                                color: function(context) {
+                                    return document.documentElement.classList.contains('dark') 
+                                        ? '#E5E7EB' : '#374151';
+                                },
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // NEW: Trucks per Hour Chart
+            const trucksPerHourCtx = document.getElementById('trucksPerHourChart')?.getContext('2d');
+            if (trucksPerHourCtx) {
+                const frontLabels = state.analytics.trucksPerHour.labels;
+                const trucksData = state.analytics.trucksPerHour.datasets[0].data;
+                
+                state.charts.trucksPerHour = new Chart(trucksPerHourCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: frontLabels,
+                        datasets: [
+                            {
+                                label: 'Caminhões por Hora',
+                                data: trucksData,
+                                backgroundColor: 'rgba(249, 115, 22, 0.7)', // Orange color
+                                borderColor: 'rgba(249, 115, 22, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Caminhões/Hora'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Média: ${context.raw.toFixed(1)} caminhões/h`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                display: false
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: (value) => value.toFixed(1),
+                                color: function(context) {
+                                    return document.documentElement.classList.contains('dark') 
+                                        ? '#E5E7EB' : '#374151';
+                                },
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
             // Apply dark mode to charts if needed
             if (document.documentElement.classList.contains('dark')) {
                 if (state.charts.frontSummary) updateChartTheme(state.charts.frontSummary);
@@ -3508,6 +3203,8 @@
                 if (state.charts.efficiencyGauge) updateChartTheme(state.charts.efficiencyGauge);
                 if (state.charts.deliveryByPeriod) updateChartTheme(state.charts.deliveryByPeriod);
                 if (state.charts.frontPerformance) updateChartTheme(state.charts.frontPerformance);
+                if (state.charts.tripsByFront) updateChartTheme(state.charts.tripsByFront);
+                if (state.charts.trucksPerHour) updateChartTheme(state.charts.trucksPerHour);
             }
         }
         
@@ -3715,6 +3412,47 @@
                 state.charts.frontPerformance.data.datasets[0].backgroundColor = 
                     efficiencyData.map(value => getEfficiencyColorGradient(value));
                 state.charts.frontPerformance.update();
+            }
+            
+            // NEW: Update trips by front chart
+            if (state.charts.tripsByFront) {
+                const frontLabels = state.fronts.map(front => `F${front}`);
+                
+                // Calculate total trips for each front
+                const tripsData = state.fronts.map(front => {
+                    return state.hours.reduce((sum, hour) => sum + state.trips[front][hour], 0);
+                });
+                
+                // Update analytics data
+                state.analytics.tripsByFront.labels = frontLabels;
+                state.analytics.tripsByFront.datasets[0].data = tripsData;
+                
+                // Update chart
+                state.charts.tripsByFront.data.labels = frontLabels;
+                state.charts.tripsByFront.data.datasets[0].data = tripsData;
+                state.charts.tripsByFront.update();
+            }
+            
+            // NEW: Update trucks per hour chart
+            if (state.charts.trucksPerHour) {
+                const frontLabels = state.fronts.map(front => `F${front}`);
+                
+                // Calculate average trucks per hour for each front
+                const trucksData = state.fronts.map(front => {
+                    const totalTrips = state.hours.reduce((sum, hour) => sum + state.trips[front][hour], 0);
+                    // Assuming 24 active hours for the average calculation
+                    const activeHours = state.hours.filter(hour => state.trips[front][hour] > 0).length || 1;
+                    return totalTrips / activeHours;
+                });
+                
+                // Update analytics data
+                state.analytics.trucksPerHour.labels = frontLabels;
+                state.analytics.trucksPerHour.datasets[0].data = trucksData;
+                
+                // Update chart
+                state.charts.trucksPerHour.data.labels = frontLabels;
+                state.charts.trucksPerHour.data.datasets[0].data = trucksData;
+                state.charts.trucksPerHour.update();
             }
             
             // Update dashboard stats cards
