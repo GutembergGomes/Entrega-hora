@@ -480,6 +480,79 @@
         .dark .text-gradient {
             background-image: linear-gradient(to right, #818CF8, #6366F1);
         }
+        
+        /* Front distribution chart tooltip */
+        .front-distribution-tooltip {
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+        
+        .dark .front-distribution-tooltip {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+        
+        /* Hourly performance chart */
+        .hourly-performance-chart .chart-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .hourly-performance-chart .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        
+        .hourly-performance-chart .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 4px;
+        }
+        
+        /* Highlight important metrics */
+        .highlight-metric {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .highlight-metric::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(93, 92, 222, 0), rgba(93, 92, 222, 0.1), rgba(93, 92, 222, 0));
+            background-size: 200% 100%;
+            animation: highlight-sweep 2s ease-in-out infinite;
+        }
+        
+        @keyframes highlight-sweep {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        
+        /* Front detail row hover effect */
+        .front-detail-row {
+            transition: all 0.2s ease;
+        }
+        
+        .front-detail-row:hover {
+            background-color: rgba(93, 92, 222, 0.05);
+        }
+        
+        .dark .front-detail-row:hover {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-200">
@@ -947,6 +1020,22 @@
                             </div>
                         </div>
                         
+                        <!-- Delivery By Front Chart -->
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Total Entregue por Frente (Toneladas)</h3>
+                                <div class="flex space-x-2">
+                                    <select id="delivery-view-selector" class="text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1">
+                                        <option value="absolute">Valores Absolutos</option>
+                                        <option value="percentage">Porcentagem do Total</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="h-80">
+                                <canvas id="deliveryByFrontChart"></canvas>
+                            </div>
+                        </div>
+                        
                         <!-- Dashboard Trips and Trucks per Hour -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -961,6 +1050,53 @@
                                 <div class="h-80">
                                     <canvas id="trucksPerHourChart"></canvas>
                                 </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Detailed Front Performance Table -->
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Detalhamento por Frente</h3>
+                                <button id="refresh-front-details" class="flex items-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm transition duration-150">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Atualizar
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Frente</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Entregue</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Potencial Total</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Eficiência</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Viagens</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Densidade Média</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Progresso</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="front-details-table" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <!-- Table rows will be populated by JavaScript -->
+                                    </tbody>
+                                    <tfoot class="bg-gray-50 dark:bg-gray-700 font-semibold">
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap">TOTAL</td>
+                                            <td id="total-entregue" class="px-4 py-3 whitespace-nowrap">0.00</td>
+                                            <td id="total-potencial" class="px-4 py-3 whitespace-nowrap">0.00</td>
+                                            <td id="total-eficiencia" class="px-4 py-3 whitespace-nowrap">0%</td>
+                                            <td id="total-viagens" class="px-4 py-3 whitespace-nowrap">0</td>
+                                            <td id="total-densidade" class="px-4 py-3 whitespace-nowrap">0.00</td>
+                                            <td class="px-4 py-3">
+                                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 relative overflow-hidden">
+                                                    <div id="total-progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                                                </div>
+                                                <span id="total-progress-text" class="text-xs mt-1 block text-right">0%</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         </div>
                         
@@ -1522,8 +1658,9 @@
                 periodComparison: null,
                 deliveryByPeriod: null,
                 frontPerformance: null,
-                tripsByFront: null, // New chart for trips by front
-                trucksPerHour: null // New chart for trucks per hour
+                tripsByFront: null, // Chart for trips by front
+                trucksPerHour: null, // Chart for trucks per hour
+                deliveryByFront: null // New chart for delivery by front
             },
             
             // Current active period
@@ -1555,11 +1692,10 @@
             analytics: {
                 periodData: {
                     day: {
-                        labels: ["06:00-08:00", "08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00",
-                                "18:00-20:00", "20:00-22:00", "22:00-00:00", "00:00-02:00", "02:00-04:00", "04:00-06:00"],
+                        labels: ["06:00-08:00", "08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00"],
                         datasets: [
-                            { label: "Entregas", data: [553, 621, 485, 392, 574, 483, 420, 380, 350, 290, 310, 430] },
-                            { label: "Potencial", data: [650, 650, 650, 650, 650, 650, 650, 650, 650, 650, 650, 650] }
+                            { label: "Entregas", data: [553, 621, 485, 392, 574, 483] },
+                            { label: "Potencial", data: [650, 650, 650, 650, 650, 650] }
                         ]
                     },
                     week: {
@@ -1583,18 +1719,41 @@
                         { label: "Eficiência", data: [85, 72, 91, 68, 76, 82] }
                     ]
                 },
-                // New analytics data for trips by front
+                // Data for trips by front
                 tripsByFront: {
                     labels: ["F4001", "F4002", "F4007", "F4009"],
                     datasets: [
                         { label: "Viagens", data: [250, 320, 180, 275] }
                     ]
                 },
-                // New analytics data for trucks per hour
+                // Data for trucks per hour
                 trucksPerHour: {
                     labels: ["F4001", "F4002", "F4007", "F4009"],
                     datasets: [
                         { label: "Caminhões/Hora", data: [5.2, 6.7, 3.8, 5.7] }
+                    ]
+                },
+                // New data for delivery by front
+                deliveryByFront: {
+                    labels: ["F4001", "F4002", "F4007", "F4009"],
+                    datasets: [
+                        { 
+                            label: "Total Entregue (ton)", 
+                            data: [865.3, 932.8, 710.5, 737.2],
+                            backgroundColor: [
+                                'rgba(93, 92, 222, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(245, 158, 11, 0.7)',
+                                'rgba(14, 165, 233, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(93, 92, 222, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(14, 165, 233, 1)'
+                            ],
+                            borderWidth: 1
+                        }
                     ]
                 }
             }
@@ -1612,6 +1771,7 @@
             calculateTwoHourTotals();
             initializeCharts();
             updateDateTimeWidgets();
+            setupDetailedFrontTable();
             
             // Set up auto-save interval
             if (state.config.autoSave) {
@@ -1631,6 +1791,14 @@
                     toggleElement(dropdown);
                 }
             });
+            
+            // Set up delivery view selector
+            document.getElementById('delivery-view-selector')?.addEventListener('change', function() {
+                updateDeliveryByFrontChart(this.value);
+            });
+            
+            // Set up refresh front details button
+            document.getElementById('refresh-front-details')?.addEventListener('click', updateDetailedFrontTable);
             
             // Close dropdown when clicking elsewhere
             document.addEventListener('click', function(e) {
@@ -1661,6 +1829,142 @@
             // Setup Manage Fronts modal
             setupManageFrontsModal();
         });
+        
+        // Set up the detailed front table
+        function setupDetailedFrontTable() {
+            // Initial setup of the table
+            updateDetailedFrontTable();
+        }
+        
+        // Update the detailed front table with real data
+        function updateDetailedFrontTable() {
+            const tableBody = document.getElementById('front-details-table');
+            if (!tableBody) return;
+            
+            // Clear the table
+            tableBody.innerHTML = '';
+            
+            // Variables for totals
+            let totalEntregue = 0;
+            let totalPotencial = 0;
+            let totalViagens = 0;
+            let totalDensidadeSum = 0;
+            let totalDensidadeCount = 0;
+            
+            // Add rows for each front
+            state.fronts.forEach(front => {
+                // Calculate front total delivery
+                let frontDelivery = 0;
+                let frontPotential = 0;
+                let frontTrips = 0;
+                let frontDensitySum = 0;
+                let frontDensityCount = 0;
+                
+                // Calculate totals across all periods
+                for (const period in state.timePeriodsMap) {
+                    const hours = state.timePeriodsMap[period];
+                    
+                    // Sum delivery and trips for this period
+                    for (const hour of hours) {
+                        frontDelivery += state.delivery[front][hour] || 0;
+                        frontTrips += state.trips[front][hour] || 0;
+                        
+                        if (state.density[front][hour] > 0) {
+                            frontDensitySum += state.density[front][hour];
+                            frontDensityCount++;
+                        }
+                    }
+                    
+                    // Sum potential for this period (only odd hours have potential)
+                    const oddHour = hours.find(h => h % 2 !== 0);
+                    if (oddHour && state.potential[front][oddHour]) {
+                        frontPotential += state.potential[front][oddHour] * 2;
+                    }
+                }
+                
+                // Calculate efficiency percentage
+                const efficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
+                
+                // Calculate average density
+                const avgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
+                
+                // Create row
+                const row = document.createElement('tr');
+                row.className = 'front-detail-row';
+                
+                // Get appropriate color for efficiency
+                const efficiencyColor = getEfficiencyTextColor(efficiency);
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap font-semibold">F${front}</td>
+                    <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">${frontDelivery.toFixed(2)} ton</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${frontPotential.toFixed(2)} ton</td>
+                    <td class="px-4 py-3 whitespace-nowrap font-medium ${efficiencyColor}">${efficiency.toFixed(1)}%</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${frontTrips}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${avgDensity.toFixed(2)}</td>
+                    <td class="px-4 py-3">
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 relative overflow-hidden">
+                            <div class="${getProgressBarColor(efficiency)} h-2.5 rounded-full" style="width: ${Math.min(100, efficiency)}%"></div>
+                        </div>
+                        <span class="text-xs mt-1 block text-right">${efficiency.toFixed(1)}%</span>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+                
+                // Add to totals
+                totalEntregue += frontDelivery;
+                totalPotencial += frontPotential;
+                totalViagens += frontTrips;
+                totalDensidadeSum += frontDensitySum;
+                totalDensidadeCount += frontDensityCount;
+            });
+            
+            // Update footer totals
+            const totalEfficiency = totalPotencial > 0 ? (totalEntregue / totalPotencial) * 100 : 0;
+            const totalAvgDensity = totalDensidadeCount > 0 ? totalDensidadeSum / totalDensidadeCount : 0;
+            
+            document.getElementById('total-entregue').textContent = `${totalEntregue.toFixed(2)} ton`;
+            document.getElementById('total-potencial').textContent = `${totalPotencial.toFixed(2)} ton`;
+            document.getElementById('total-eficiencia').textContent = `${totalEfficiency.toFixed(1)}%`;
+            document.getElementById('total-viagens').textContent = totalViagens;
+            document.getElementById('total-densidade').textContent = totalAvgDensity.toFixed(2);
+            
+            const totalProgressBar = document.getElementById('total-progress-bar');
+            const totalProgressText = document.getElementById('total-progress-text');
+            
+            if (totalProgressBar && totalProgressText) {
+                totalProgressBar.style.width = `${Math.min(100, totalEfficiency)}%`;
+                totalProgressBar.className = `${getProgressBarColor(totalEfficiency)} h-2.5 rounded-full`;
+                totalProgressText.textContent = `${totalEfficiency.toFixed(1)}%`;
+            }
+        }
+        
+        // Helper function to get text color class based on efficiency percentage
+        function getEfficiencyTextColor(value) {
+            if (value >= 90) {
+                return "text-success-600 dark:text-success-400";  // Green
+            } else if (value >= 75) {
+                return "text-primary-600 dark:text-primary-400";  // Primary
+            } else if (value >= 50) {
+                return "text-warning-600 dark:text-warning-400";  // Yellow
+            } else {
+                return "text-danger-600 dark:text-danger-400";    // Red
+            }
+        }
+        
+        // Helper function to get progress bar color class based on efficiency percentage
+        function getProgressBarColor(value) {
+            if (value >= 90) {
+                return "bg-success-500 dark:bg-success-600";  // Green
+            } else if (value >= 75) {
+                return "bg-primary dark:bg-primary-600";      // Primary
+            } else if (value >= 50) {
+                return "bg-warning-500 dark:bg-warning-600";  // Yellow
+            } else {
+                return "bg-danger-500 dark:bg-danger-600";    // Red
+            }
+        }
         
         // Show Manage Fronts Modal
         function showManageFrontsModal() {
@@ -1772,6 +2076,9 @@
             // Update charts that display front data
             updateCharts();
             
+            // Update the detailed front table
+            updateDetailedFrontTable();
+            
             showToast(`Frente ${frontValue} adicionada com sucesso`, 'success');
             
             // Add to history
@@ -1811,6 +2118,9 @@
             
             // Update charts
             updateCharts();
+            
+            // Update the detailed front table
+            updateDetailedFrontTable();
             
             showToast(`Frente ${front} removida com sucesso`, 'success');
             
@@ -2362,6 +2672,7 @@
                 // If showing the dashboard, update the dashboard with current data
                 if (page === 'dashboard') {
                     updateDashboardCharts();
+                    updateDetailedFrontTable();
                 }
             } else {
                 // If page doesn't exist, show dashboard
@@ -2645,6 +2956,12 @@
             
             // Manage fronts button
             document.getElementById('manage-fronts')?.addEventListener('click', showManageFrontsModal);
+            
+            // Theme toggle button
+            document.getElementById('theme-toggle')?.addEventListener('click', toggleDarkMode);
+            
+            // Setup keyboard shortcuts
+            setupKeyboardShortcuts();
         }
         
         // Tab Switching Functions
@@ -2822,6 +3139,11 @@
         function updateUI() {
             updateDeliveryUI();
             updateCharts();
+            
+            // Also update the detailed front table if we're on the dashboard
+            if (state.currentPage === 'dashboard') {
+                updateDetailedFrontTable();
+            }
         }
         
         function updateDeliveryUI() {
@@ -3222,14 +3544,6 @@
                                 title: {
                                     display: true,
                                     text: 'Períodos'
-                                },
-                                ticks: {
-                                    // Make x-axis labels more readable by using a smaller font or rotating them
-                                    font: {
-                                        size: 9
-                                    },
-                                    maxRotation: 45,
-                                    minRotation: 45
                                 }
                             }
                         },
@@ -3257,10 +3571,8 @@
                                         ? '#E5E7EB' : '#374151';
                                 },
                                 font: {
-                                    weight: 'bold',
-                                    size: 9
-                                },
-                                rotation: -45
+                                    weight: 'bold'
+                                }
                             }
                         }
                     }
@@ -3330,7 +3642,7 @@
                 });
             }
             
-            // NEW: Trips by Front Chart
+            // Trips by Front Chart
             const tripsByFrontCtx = document.getElementById('tripsByFrontChart')?.getContext('2d');
             if (tripsByFrontCtx) {
                 const frontLabels = state.analytics.tripsByFront.labels;
@@ -3393,7 +3705,7 @@
                 });
             }
             
-            // NEW: Trucks per Hour Chart
+            // Trucks per Hour Chart
             const trucksPerHourCtx = document.getElementById('trucksPerHourChart')?.getContext('2d');
             if (trucksPerHourCtx) {
                 const frontLabels = state.analytics.trucksPerHour.labels;
@@ -3456,6 +3768,80 @@
                 });
             }
             
+            // Initialize new Delivery By Front Chart
+            const deliveryByFrontCtx = document.getElementById('deliveryByFrontChart')?.getContext('2d');
+            if (deliveryByFrontCtx) {
+                const frontLabels = state.analytics.deliveryByFront.labels;
+                const deliveryData = state.analytics.deliveryByFront.datasets[0].data;
+                const backgroundColors = state.analytics.deliveryByFront.datasets[0].backgroundColor;
+                
+                state.charts.deliveryByFront = new Chart(deliveryByFrontCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: frontLabels,
+                        datasets: [
+                            {
+                                label: 'Total Entregue (ton)',
+                                data: deliveryData,
+                                backgroundColor: backgroundColors,
+                                borderColor: state.analytics.deliveryByFront.datasets[0].borderColor,
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Toneladas'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (document.getElementById('delivery-view-selector')?.value === 'percentage') {
+                                            return `Contribuição: ${context.raw.toFixed(1)}%`;
+                                        } else {
+                                            return `Total Entregue: ${context.raw.toFixed(2)} ton`;
+                                        }
+                                    }
+                                }
+                            },
+                            legend: {
+                                display: false
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: function(value, context) {
+                                    if (document.getElementById('delivery-view-selector')?.value === 'percentage') {
+                                        return value.toFixed(1) + '%';
+                                    } else {
+                                        return value.toFixed(1) + ' t';
+                                    }
+                                },
+                                color: function(context) {
+                                    return document.documentElement.classList.contains('dark') 
+                                        ? '#E5E7EB' : '#374151';
+                                },
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
             // Apply dark mode to charts if needed
             if (document.documentElement.classList.contains('dark')) {
                 if (state.charts.frontSummary) updateChartTheme(state.charts.frontSummary);
@@ -3465,7 +3851,58 @@
                 if (state.charts.frontPerformance) updateChartTheme(state.charts.frontPerformance);
                 if (state.charts.tripsByFront) updateChartTheme(state.charts.tripsByFront);
                 if (state.charts.trucksPerHour) updateChartTheme(state.charts.trucksPerHour);
+                if (state.charts.deliveryByFront) updateChartTheme(state.charts.deliveryByFront);
             }
+        }
+        
+        // Update delivery by front chart view (absolute or percentage)
+        function updateDeliveryByFrontChart(viewMode) {
+            if (!state.charts.deliveryByFront) return;
+            
+            const frontLabels = state.fronts.map(front => `F${front}`);
+            let chartData;
+            
+            if (viewMode === 'percentage') {
+                // Calculate total delivery
+                const totalDelivery = state.fronts.reduce((total, front) => {
+                    let frontTotal = 0;
+                    for (const hour of state.hours) {
+                        frontTotal += state.delivery[front][hour];
+                    }
+                    return total + frontTotal;
+                }, 0);
+                
+                // Calculate percentage for each front
+                chartData = state.fronts.map(front => {
+                    let frontTotal = 0;
+                    for (const hour of state.hours) {
+                        frontTotal += state.delivery[front][hour];
+                    }
+                    return totalDelivery > 0 ? (frontTotal / totalDelivery) * 100 : 0;
+                });
+                
+                // Update y-axis title
+                state.charts.deliveryByFront.options.scales.y.title.text = 'Porcentagem do Total (%)';
+            } else {
+                // Use absolute values
+                chartData = state.fronts.map(front => {
+                    let frontTotal = 0;
+                    for (const hour of state.hours) {
+                        frontTotal += state.delivery[front][hour];
+                    }
+                    return frontTotal;
+                });
+                
+                // Update y-axis title
+                state.charts.deliveryByFront.options.scales.y.title.text = 'Toneladas';
+            }
+            
+            // Update chart data
+            state.charts.deliveryByFront.data.labels = frontLabels;
+            state.charts.deliveryByFront.data.datasets[0].data = chartData;
+            
+            // Update chart
+            state.charts.deliveryByFront.update();
         }
         
         function updatePeriodChart(period) {
@@ -3600,13 +4037,13 @@
         function updateDashboardCharts() {
             // Update delivery by period chart on dashboard
             if (state.charts.deliveryByPeriod) {
-                // Get real data from the delivery state for all periods (full 24 hours)
+                // Get real data from the delivery state for each period
                 const periods = Object.keys(state.timePeriodsMap);
-                const periodLabels = periods.map(period => {
+                const periodLabels = periods.slice(0, 6).map(period => {
                     return `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`;
                 });
                 
-                const deliveryData = periods.map(period => {
+                const deliveryData = periods.slice(0, 6).map(period => {
                     const hours = state.timePeriodsMap[period];
                     return state.fronts.reduce((sum, front) => {
                         return sum + hours.reduce((hourSum, hour) => {
@@ -3615,7 +4052,7 @@
                     }, 0);
                 });
                 
-                const potentialData = periods.map(period => {
+                const potentialData = periods.slice(0, 6).map(period => {
                     const hours = state.timePeriodsMap[period];
                     const oddHour = hours.find(h => h % 2 !== 0) || hours[0];
                     return state.fronts.reduce((sum, front) => {
@@ -3674,7 +4111,7 @@
                 state.charts.frontPerformance.update();
             }
             
-            // NEW: Update trips by front chart
+            // Update trips by front chart
             if (state.charts.tripsByFront) {
                 const frontLabels = state.fronts.map(front => `F${front}`);
                 
@@ -3693,7 +4130,7 @@
                 state.charts.tripsByFront.update();
             }
             
-            // NEW: Update trucks per hour chart
+            // Update trucks per hour chart
             if (state.charts.trucksPerHour) {
                 const frontLabels = state.fronts.map(front => `F${front}`);
                 
@@ -3713,6 +4150,12 @@
                 state.charts.trucksPerHour.data.labels = frontLabels;
                 state.charts.trucksPerHour.data.datasets[0].data = trucksData;
                 state.charts.trucksPerHour.update();
+            }
+            
+            // Update delivery by front chart
+            if (state.charts.deliveryByFront) {
+                const viewMode = document.getElementById('delivery-view-selector')?.value || 'absolute';
+                updateDeliveryByFrontChart(viewMode);
             }
             
             // Update dashboard stats cards
@@ -3774,18 +4217,10 @@
                 const deliveredValue = deliveredCard.querySelector('.text-2xl');
                 const deliveredProgress = deliveredCard.querySelector('.bg-primary');
                 
-                if (deliveredValue) {
-                    deliveredValue.textContent = totalDelivery.toFixed(1);
-                }
-                
-                if (deliveredProgress && totalPotential > 0) {
-                    const deliveryPercentage = Math.min(100, (totalDelivery / totalPotential) * 100);
-                    deliveredProgress.style.width = `${deliveryPercentage}%`;
-                    
-                    const percentText = deliveredCard.querySelector('.text-xs');
-                    if (percentText) {
-                        percentText.textContent = `${Math.round(deliveryPercentage)}% da meta mensal`;
-                    }
+                if (deliveredValue) deliveredValue.textContent = totalDelivery.toFixed(1);
+                if (deliveredProgress) {
+                    const progressPercentage = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    deliveredProgress.style.width = `${Math.min(100, progressPercentage)}%`;
                 }
                 
                 // Efficiency
@@ -3793,346 +4228,249 @@
                 const efficiencyValue = efficiencyCard.querySelector('.text-2xl');
                 const efficiencyProgress = efficiencyCard.querySelector('.bg-blue-500');
                 
-                if (efficiencyValue) {
-                    efficiencyValue.textContent = `${efficiency.toFixed(1)}%`;
-                }
-                
-                if (efficiencyProgress) {
-                    efficiencyProgress.style.width = `${Math.min(100, efficiency)}%`;
-                }
+                if (efficiencyValue) efficiencyValue.textContent = `${efficiency.toFixed(1)}%`;
+                if (efficiencyProgress) efficiencyProgress.style.width = `${Math.min(100, efficiency)}%`;
                 
                 // Trips
                 const tripsCard = dashboardCards[2];
                 const tripsValue = tripsCard.querySelector('.text-2xl');
+                const tripsProgress = tripsCard.querySelector('.bg-green-500');
                 
-                if (tripsValue) {
-                    tripsValue.textContent = totalTrips;
+                if (tripsValue) tripsValue.textContent = totalTrips.toString();
+                if (tripsProgress) {
+                    // Assume a target of 1,500 trips for the progress bar
+                    const targetTrips = 1500;
+                    const tripsPercentage = (totalTrips / targetTrips) * 100;
+                    tripsProgress.style.width = `${Math.min(100, tripsPercentage)}%`;
                 }
                 
                 // Density
                 const densityCard = dashboardCards[3];
                 const densityValue = densityCard.querySelector('.text-2xl');
+                const densityProgress = densityCard.querySelector('.bg-purple-500');
                 
-                if (densityValue) {
-                    densityValue.textContent = avgDensity.toFixed(2);
+                if (densityValue) densityValue.textContent = avgDensity.toFixed(2);
+                if (densityProgress) {
+                    // Assume a target density of 65.00
+                    const targetDensity = 65.00;
+                    const densityPercentage = (avgDensity / targetDensity) * 100;
+                    densityProgress.style.width = `${Math.min(100, densityPercentage)}%`;
                 }
             }
         }
         
-        // Load initial data
-        function loadInitialData() {
-            // Set some sample data
-            const sampleFronts = ['4001', '4002', '4007', '4009'];
-            
-            for (const front of sampleFronts) {
-                // Add density values for different hours (just for example)
-                state.density[front][6] = 65.0;
-                state.density[front][7] = 67.5;
-                state.density[front][8] = 70.0;
-                state.density[front][9] = 72.0;
-                
-                // Add trip values
-                state.trips[front][6] = 5;
-                state.trips[front][7] = 7;
-                state.trips[front][8] = 6;
-                state.trips[front][9] = 8;
-                
-                // Add potential values for odd hours
-                state.potential[front][7] = 500;
-                state.potential[front][9] = 550;
-            }
-            
-            // Calculate delivery based on density and trips
-            calculateDelivery();
-            calculateTwoHourTotals();
-        }
-        
-        // Save/Load Data Functions
-        function saveData() {
-            try {
-                // Convert state to a serializable object
-                const dataToSave = {
-                    fronts: state.fronts,
-                    density: state.density,
-                    trips: state.trips,
-                    potential: state.potential,
-                    delivery: state.delivery
-                };
-                
-                const jsonString = JSON.stringify(dataToSave);
-                localStorage.setItem('delivery_data', jsonString);
-                return true;
-            } catch (error) {
-                console.error('Error saving data:', error);
-                return false;
-            }
-        }
-        
-        function loadSavedData() {
-            try {
-                const savedData = localStorage.getItem('delivery_data');
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-                    
-                    // Restore saved data to state
-                    if (parsedData.fronts) {
-                        state.fronts = parsedData.fronts;
-                    }
-                    state.density = parsedData.density || state.density;
-                    state.trips = parsedData.trips || state.trips;
-                    state.potential = parsedData.potential || state.potential;
-                    state.delivery = parsedData.delivery || state.delivery;
-                    
-                    // Recalculate and update UI
-                    calculateDelivery();
-                    calculateTwoHourTotals();
-                    updateUI();
-                    showToast('Dados carregados com sucesso', 'success');
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error('Error loading data:', error);
-                return false;
-            }
-        }
-        
-        // Config Functions
-        function saveConfig() {
-            try {
-                const jsonString = JSON.stringify(state.config);
-                localStorage.setItem('app_config', jsonString);
-                return true;
-            } catch (error) {
-                console.error('Error saving config:', error);
-                return false;
-            }
-        }
-        
-        function loadConfig() {
-            try {
-                const savedConfig = localStorage.getItem('app_config');
-                if (savedConfig) {
-                    const parsedConfig = JSON.parse(savedConfig);
-                    
-                    // Merge saved config with default values
-                    state.config = { ...state.config, ...parsedConfig };
-                    
-                    // Update UI based on loaded config
-                    updateUIFromConfig();
-                }
-            } catch (error) {
-                console.error('Error loading config:', error);
-            }
-        }
-        
-        function updateUIFromConfig() {
-            // Update UI elements based on config
-            const autoSaveToggle = document.getElementById('auto-save-toggle');
-            const autoSaveInterval = document.getElementById('auto-save-interval');
+        // Setup Dark Mode
+        function setupDarkMode() {
             const darkModeToggle = document.getElementById('dark-mode-toggle');
-            const alertThreshold = document.getElementById('alert-threshold');
-            const soundAlertToggle = document.getElementById('sound-alert-toggle');
-            const visualAlertToggle = document.getElementById('visual-alert-toggle');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
             
-            if (autoSaveToggle) autoSaveToggle.checked = state.config.autoSave;
-            if (autoSaveInterval) autoSaveInterval.value = state.config.autoSaveInterval;
-            if (darkModeToggle) darkModeToggle.checked = state.config.darkMode;
-            if (alertThreshold) alertThreshold.value = state.config.alertThreshold;
-            if (soundAlertToggle) soundAlertToggle.checked = state.config.soundAlerts;
-            if (visualAlertToggle) visualAlertToggle.checked = state.config.visualAlerts;
+            // Check if dark mode is enabled
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+                state.config.darkMode = true;
+            }
+            
+            // Update dark mode toggle UI
+            updateDarkModeToggle();
+            
+            // Listen for changes to color scheme
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                    state.config.darkMode = true;
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    state.config.darkMode = false;
+                }
+                
+                updateDarkModeToggle();
+                updateChartsTheme();
+            });
         }
         
-        function updateConfigFromUI() {
-            // Update config from UI elements
-            const autoSaveToggle = document.getElementById('auto-save-toggle');
-            const autoSaveInterval = document.getElementById('auto-save-interval');
-            const darkModeToggle = document.getElementById('dark-mode-toggle');
-            const alertThreshold = document.getElementById('alert-threshold');
-            const soundAlertToggle = document.getElementById('sound-alert-toggle');
-            const visualAlertToggle = document.getElementById('visual-alert-toggle');
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                state.config.darkMode = false;
+            } else {
+                document.documentElement.classList.add('dark');
+                state.config.darkMode = true;
+            }
             
-            state.config.autoSave = autoSaveToggle ? autoSaveToggle.checked : state.config.autoSave;
-            state.config.autoSaveInterval = autoSaveInterval ? parseInt(autoSaveInterval.value) : state.config.autoSaveInterval;
-            state.config.darkMode = darkModeToggle ? darkModeToggle.checked : state.config.darkMode;
-            state.config.alertThreshold = alertThreshold ? parseInt(alertThreshold.value) : state.config.alertThreshold;
-            state.config.soundAlerts = soundAlertToggle ? soundAlertToggle.checked : state.config.soundAlerts;
-            state.config.visualAlerts = visualAlertToggle ? visualAlertToggle.checked : state.config.visualAlerts;
+            updateDarkModeToggle();
+            updateChartsTheme();
+            saveConfig();
+        }
+        
+        // Update Dark Mode Toggle UI
+        function updateDarkModeToggle() {
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const darkModeCheckbox = document.getElementById('dark-mode-toggle');
             
-            // Apply dark mode from UI
-            updateDarkMode();
+            if (document.documentElement.classList.contains('dark')) {
+                if (lightIcon) lightIcon.classList.remove('hidden');
+                if (darkIcon) darkIcon.classList.add('hidden');
+                if (darkModeCheckbox) darkModeCheckbox.checked = true;
+            } else {
+                if (lightIcon) lightIcon.classList.add('hidden');
+                if (darkIcon) darkIcon.classList.remove('hidden');
+                if (darkModeCheckbox) darkModeCheckbox.checked = false;
+            }
+        }
+        
+        // Update Dark Mode
+        function updateDarkMode() {
+            if (state.config.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            updateDarkModeToggle();
+            updateChartsTheme();
+        }
+        
+        // Update Charts Theme
+        function updateChartsTheme() {
+            if (state.charts.frontSummary) updateChartTheme(state.charts.frontSummary);
+            if (state.charts.hourlyPerformance) updateChartTheme(state.charts.hourlyPerformance);
+            if (state.charts.efficiencyGauge) updateChartTheme(state.charts.efficiencyGauge);
+            if (state.charts.deliveryByPeriod) updateChartTheme(state.charts.deliveryByPeriod);
+            if (state.charts.frontPerformance) updateChartTheme(state.charts.frontPerformance);
+            if (state.charts.tripsByFront) updateChartTheme(state.charts.tripsByFront);
+            if (state.charts.trucksPerHour) updateChartTheme(state.charts.trucksPerHour);
+            if (state.charts.deliveryByFront) updateChartTheme(state.charts.deliveryByFront);
         }
         
         // Export Functions
         function exportJSON() {
-            // Prepare data
-            const dataToExport = {
+            const data = {
                 fronts: state.fronts,
                 density: state.density,
                 trips: state.trips,
-                potential: state.potential,
                 delivery: state.delivery,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
+                potential: state.potential,
+                date: new Date().toISOString()
             };
             
-            // Convert to JSON string
-            const jsonString = JSON.stringify(dataToExport, null, 2);
-            
-            // Create blob and download link
-            const blob = new Blob([jsonString], { type: 'application/json' });
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
             
+            const a = document.createElement('a');
             a.href = url;
-            a.download = `entrega_data_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `safra-2025-data-${formatDate(new Date())}.json`;
             document.body.appendChild(a);
             a.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            showToast('Dados exportados com sucesso (JSON)', 'success');
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         
         function exportCSV() {
-            // Headers
-            let csvContent = 'Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
+            let csvContent = 'data:text/csv;charset=utf-8,';
             
-            // Data rows
+            // Headers
+            csvContent += 'Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
+            
+            // Data
             for (const front of state.fronts) {
                 for (const hour of state.hours) {
-                    const density = state.density[front][hour];
-                    const trips = state.trips[front][hour];
-                    const delivery = state.delivery[front][hour];
-                    const potential = state.potential[front][hour];
+                    const row = [
+                        front,
+                        hour,
+                        state.density[front][hour],
+                        state.trips[front][hour],
+                        state.delivery[front][hour],
+                        state.potential[front][hour]
+                    ];
                     
-                    csvContent += `${front},${hour},${density},${trips},${delivery},${potential}\n`;
+                    csvContent += row.join(',') + '\n';
                 }
             }
             
-            // Create blob and download link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            
-            a.href = url;
-            a.download = `entrega_data_${new Date().toISOString().slice(0, 10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            showToast('Dados exportados com sucesso (CSV)', 'success');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `safra-2025-data-${formatDate(new Date())}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
         
         function exportPDF() {
-            // Check if jsPDF is loaded
-            if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
-                showToast('Erro: jsPDF não está disponível', 'error');
+            if (typeof window.jspdf === 'undefined') {
+                showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
                 return;
             }
             
-            // Create PDF document
-            const { jsPDF } = jspdf;
-            const doc = new jsPDF();
+            // Create a new PDF document
+            const doc = new jspdf.jsPDF();
             
             // Add title
             doc.setFontSize(18);
-            doc.text('Relatório de Entrega de Safra', 14, 20);
+            doc.text('Relatório de Entrega de Safra 2025', 14, 20);
             
             // Add date
             doc.setFontSize(10);
-            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 30);
+            doc.text(`Data: ${formatDate(new Date())}`, 14, 30);
             
-            // Add period summary table
-            doc.setFontSize(14);
-            doc.text(`Resumo do Período: ${state.activePeriod.substring(0, 2)}:00-${state.activePeriod.substring(3, 5)}:00`, 14, 40);
+            // Define table headers
+            const headers = [['Frente', 'Hora', 'Densidade', 'Viagens', 'Entrega', 'Potencial']];
             
-            // Create period summary table data
-            const tableData = [];
-            tableData.push(['Frente', 'Entrega (2h)', 'Potencial (2h)', 'Diferença', '% Realizado']);
+            // Prepare table data
+            const data = [];
             
             for (const front of state.fronts) {
-                const entrega = state.twoHourDelivery[state.activePeriod][front];
-                const potencial = state.twoHourPotential[state.activePeriod][front];
-                const diferenca = state.difference[state.activePeriod][front];
-                const percentual = potencial > 0 ? (entrega / potencial) * 100 : 0;
-                
-                tableData.push([
-                    `F${front}`,
-                    entrega.toFixed(2),
-                    potencial.toString(),
-                    diferenca.toFixed(2),
-                    `${percentual.toFixed(1)}%`
-                ]);
+                for (const hour of state.hours) {
+                    data.push([
+                        front,
+                        hour,
+                        state.density[front][hour].toFixed(2),
+                        state.trips[front][hour],
+                        state.delivery[front][hour].toFixed(2),
+                        state.potential[front][hour]
+                    ]);
+                }
             }
             
-            // Add totals row
-            const totalEntrega = state.fronts.reduce((sum, front) => sum + state.twoHourDelivery[state.activePeriod][front], 0);
-            const totalPotencial = state.fronts.reduce((sum, front) => sum + state.twoHourPotential[state.activePeriod][front], 0);
-            const totalDiferenca = state.fronts.reduce((sum, front) => sum + state.difference[state.activePeriod][front], 0);
-            const totalPercentual = totalPotencial > 0 ? (totalEntrega / totalPotencial) * 100 : 0;
-            
-            tableData.push([
-                'TOTAL',
-                totalEntrega.toFixed(2),
-                totalPotencial.toString(),
-                totalDiferenca.toFixed(2),
-                `${totalPercentual.toFixed(1)}%`
-            ]);
-            
-            // Add table to PDF
+            // Add table
             doc.autoTable({
-                startY: 45,
-                head: [tableData[0]],
-                body: tableData.slice(1),
-                theme: 'grid',
+                head: headers,
+                body: data,
+                startY: 40,
+                theme: 'striped',
                 headStyles: { fillColor: [93, 92, 222] },
-                alternateRowStyles: { fillColor: [240, 240, 255] }
+                margin: { top: 40 }
             });
             
-            // Save PDF
-            doc.save(`relatorio_entrega_${state.activePeriod}_${new Date().toISOString().slice(0, 10)}.pdf`);
-            
-            showToast('Relatório exportado com sucesso (PDF)', 'success');
+            // Save the PDF
+            doc.save(`safra-2025-report-${formatDate(new Date())}.pdf`);
         }
         
         function exportDashboard() {
-            // Check if jsPDF is loaded
-            if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
-                showToast('Erro: jsPDF não está disponível', 'error');
+            if (typeof window.jspdf === 'undefined') {
+                showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
                 return;
             }
             
-            // Create PDF document
-            const { jsPDF } = jspdf;
-            const doc = new jsPDF();
+            // Create a new PDF document
+            const doc = new jspdf.jsPDF();
             
             // Add title
             doc.setFontSize(18);
-            doc.text('Dashboard de Entrega de Safra', 14, 20);
+            doc.text('Dashboard de Desempenho - Safra 2025', 14, 20);
             
             // Add date
             doc.setFontSize(10);
-            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 30);
+            doc.text(`Exportado em: ${formatDate(new Date())}`, 14, 30);
             
-            // Add summary cards
-            doc.setFontSize(14);
-            doc.text('Resumo de Desempenho', 14, 40);
+            // Add summary table
+            const summaryHeaders = [['Métrica', 'Valor']];
             
-            // Create summary table
-            const summaryData = [];
-            summaryData.push(['Métrica', 'Valor', '% da Meta']);
-            
-            // Calculate summary values
+            // Calculate summary data
             const totalDelivery = Object.keys(state.delivery).reduce((frontSum, front) => {
                 return frontSum + Object.keys(state.delivery[front]).reduce((hourSum, hour) => {
                     return hourSum + state.delivery[front][hour];
@@ -4159,90 +4497,75 @@
                 }, 0);
             }, 0);
             
-            let densitySum = 0;
-            let densityCount = 0;
+            // Create summary data array
+            const summaryData = [
+                ['Total Entregue', `${totalDelivery.toFixed(2)} ton`],
+                ['Total Potencial', `${totalPotential.toFixed(2)} ton`],
+                ['Eficiência', `${efficiency.toFixed(1)}%`],
+                ['Total de Viagens', totalTrips.toString()]
+            ];
             
-            for (const front in state.density) {
-                for (const hour in state.density[front]) {
-                    if (state.density[front][hour] > 0) {
-                        densitySum += state.density[front][hour];
-                        densityCount++;
-                    }
-                }
-            }
-            
-            const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
-            
-            // Add data to summary table
-            const deliveryPercentage = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
-            
-            summaryData.push(['Total Entregue', `${totalDelivery.toFixed(2)} ton`, `${deliveryPercentage.toFixed(1)}%`]);
-            summaryData.push(['Eficiência Média', `${efficiency.toFixed(1)}%`, `${(efficiency / 85 * 100).toFixed(1)}%`]);
-            summaryData.push(['Viagens Realizadas', totalTrips.toString(), 'N/A']);
-            summaryData.push(['Densidade Média', avgDensity.toFixed(2), 'N/A']);
-            
-            // Add table to PDF
+            // Add summary table
             doc.autoTable({
-                startY: 45,
-                head: [summaryData[0]],
-                body: summaryData.slice(1),
-                theme: 'grid',
+                head: summaryHeaders,
+                body: summaryData,
+                startY: 40,
+                theme: 'striped',
                 headStyles: { fillColor: [93, 92, 222] },
-                alternateRowStyles: { fillColor: [240, 240, 255] }
+                margin: { top: 40 }
             });
             
-            // Add front performance
-            doc.setFontSize(14);
-            doc.text('Desempenho por Frente', 14, doc.autoTable.previous.finalY + 15);
-            
-            // Create front performance table
+            // Add detailed data by front
+            const frontHeaders = [['Frente', 'Total Entregue', 'Potencial Total', 'Eficiência', 'Viagens']];
             const frontData = [];
-            frontData.push(['Frente', 'Entrega (ton)', 'Potencial (ton)', 'Eficiência']);
             
             for (const front of state.fronts) {
                 let frontDelivery = 0;
                 let frontPotential = 0;
+                let frontTrips = 0;
                 
-                // Calculate front totals
+                // Calculate totals across all periods
                 for (const period in state.timePeriodsMap) {
                     const hours = state.timePeriodsMap[period];
                     
-                    // Sum delivery
+                    // Sum delivery and trips for this period
                     for (const hour of hours) {
-                        frontDelivery += state.delivery[front][hour];
+                        frontDelivery += state.delivery[front][hour] || 0;
+                        frontTrips += state.trips[front][hour] || 0;
                     }
                     
-                    // Sum potential (odd hours)
+                    // Sum potential for this period (only odd hours have potential)
                     const oddHour = hours.find(h => h % 2 !== 0);
                     if (oddHour && state.potential[front][oddHour]) {
                         frontPotential += state.potential[front][oddHour] * 2;
                     }
                 }
                 
+                // Calculate efficiency
                 const frontEfficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
                 
                 frontData.push([
                     `F${front}`,
-                    frontDelivery.toFixed(2),
-                    frontPotential.toFixed(2),
-                    `${frontEfficiency.toFixed(1)}%`
+                    `${frontDelivery.toFixed(2)} ton`,
+                    `${frontPotential.toFixed(2)} ton`,
+                    `${frontEfficiency.toFixed(1)}%`,
+                    frontTrips.toString()
                 ]);
             }
             
-            // Add front performance table to PDF
+            // Add front data table
             doc.autoTable({
-                startY: doc.autoTable.previous.finalY + 20,
-                head: [frontData[0]],
-                body: frontData.slice(1),
-                theme: 'grid',
-                headStyles: { fillColor: [93, 92, 222] },
-                alternateRowStyles: { fillColor: [240, 240, 255] }
+                head: frontHeaders,
+                body: frontData,
+                startY: doc.lastAutoTable.finalY + 10,
+                theme: 'striped',
+                headStyles: { fillColor: [93, 92, 222] }
             });
             
-            // Save PDF
-            doc.save(`dashboard_entrega_${new Date().toISOString().slice(0, 10)}.pdf`);
+            // Save the PDF
+            doc.save(`safra-2025-dashboard-${formatDate(new Date())}.pdf`);
             
-            showToast('Dashboard exportado com sucesso (PDF)', 'success');
+            showToast('Dashboard exportado com sucesso!', 'success');
         }
         
         // Confirmation Modal Functions
@@ -4252,210 +4575,252 @@
             const modalMessage = document.getElementById('modal-message');
             const modalConfirm = document.getElementById('modal-confirm');
             
-            if (!modal || !modalTitle || !modalMessage || !modalConfirm) return;
-            
-            // Set modal content
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            
-            // Set confirm button action
-            modalConfirm.onclick = () => {
-                if (typeof confirmCallback === 'function') {
-                    confirmCallback();
-                }
-                closeConfirmationModal();
-            };
-            
-            // Show modal
-            modal.classList.remove('hidden');
+            if (modal && modalTitle && modalMessage && modalConfirm) {
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                
+                // Remove previous event listener
+                const newModalConfirm = modalConfirm.cloneNode(true);
+                modalConfirm.parentNode.replaceChild(newModalConfirm, modalConfirm);
+                
+                // Add new event listener
+                newModalConfirm.addEventListener('click', function() {
+                    if (typeof confirmCallback === 'function') {
+                        confirmCallback();
+                    }
+                    closeConfirmationModal();
+                });
+                
+                // Show modal
+                toggleElement(modal, true);
+            }
         }
         
         function closeConfirmationModal() {
             const modal = document.getElementById('confirmation-modal');
-            if (modal) modal.classList.add('hidden');
+            toggleElement(modal, false);
         }
         
-        // Toast notification functions
+        // Toast Notification Functions
         function showToast(message, type = 'info') {
             const toastContainer = document.getElementById('toast-container');
             if (!toastContainer) return;
             
             const toast = document.createElement('div');
-            toast.className = 'flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white dark:bg-gray-800 rounded-lg shadow-md';
+            toast.className = `p-4 mb-3 rounded-md shadow-md transform transition-all duration-300 ease-in-out translate-x-0 opacity-100 max-w-md`;
             
-            let iconSvg = '';
-            let bgColor = 'bg-blue-100 dark:bg-blue-900';
-            let iconColor = 'text-blue-500 dark:text-blue-400';
+            let bgColor, textColor, icon;
             
-            switch(type) {
+            switch (type) {
                 case 'success':
-                    iconSvg = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>`;
-                    bgColor = 'bg-green-100 dark:bg-green-900';
-                    iconColor = 'text-green-500 dark:text-green-400';
+                    bgColor = 'bg-success-500 dark:bg-success-600';
+                    textColor = 'text-white';
+                    icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>`;
                     break;
                 case 'error':
-                    iconSvg = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>`;
-                    bgColor = 'bg-red-100 dark:bg-red-900';
-                    iconColor = 'text-red-500 dark:text-red-400';
+                    bgColor = 'bg-danger-500 dark:bg-danger-600';
+                    textColor = 'text-white';
+                    icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>`;
                     break;
                 case 'warning':
-                    iconSvg = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                    </svg>`;
-                    bgColor = 'bg-yellow-100 dark:bg-yellow-900';
-                    iconColor = 'text-yellow-500 dark:text-yellow-400';
+                    bgColor = 'bg-warning-500 dark:bg-warning-600';
+                    textColor = 'text-white';
+                    icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>`;
                     break;
                 default: // info
-                    iconSvg = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>`;
-                    bgColor = 'bg-blue-100 dark:bg-blue-900';
-                    iconColor = 'text-blue-500 dark:text-blue-400';
+                    bgColor = 'bg-primary dark:bg-primary-600';
+                    textColor = 'text-white';
+                    icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>`;
             }
+            
+            toast.className += ` ${bgColor} ${textColor}`;
             
             toast.innerHTML = `
-                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${bgColor} rounded-lg ${iconColor}">
-                    ${iconSvg}
+                <div class="flex items-center">
+                    ${icon}
+                    <span>${message}</span>
                 </div>
-                <div class="ml-3 text-sm font-normal text-gray-800 dark:text-gray-200">${message}</div>
-                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" aria-label="Close">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                </button>
             `;
             
-            // Add toast to container
             toastContainer.appendChild(toast);
             
-            // Add click event to close button
-            toast.querySelector('button').addEventListener('click', () => {
-                toast.remove();
-            });
-            
-            // Auto remove toast after 5 seconds
+            // Animate entry
             setTimeout(() => {
-                toast.classList.add('opacity-0');
+                toast.classList.add('translate-y-2');
+            }, 10);
+            
+            // Auto-remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('translate-x-0', 'opacity-100');
+                toast.classList.add('translate-x-full', 'opacity-0');
+                
                 setTimeout(() => {
-                    toast.remove();
+                    if (toast.parentNode === toastContainer) {
+                        toastContainer.removeChild(toast);
+                    }
                 }, 300);
-            }, 5000);
-        }
-        
-        // Dark Mode Functions
-        function setupDarkMode() {
-            // Check for dark mode preference
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
-                state.config.darkMode = true;
-            }
+            }, 3000);
             
-            // Listen for dark mode changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                if (event.matches) {
-                    document.documentElement.classList.add('dark');
-                    state.config.darkMode = true;
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    state.config.darkMode = false;
-                }
+            // Add click-to-dismiss functionality
+            toast.addEventListener('click', function() {
+                toast.classList.remove('translate-x-0', 'opacity-100');
+                toast.classList.add('translate-x-full', 'opacity-0');
                 
-                updateChartThemes();
+                setTimeout(() => {
+                    if (toast.parentNode === toastContainer) {
+                        toastContainer.removeChild(toast);
+                    }
+                }, 300);
             });
-            
-            // Set up theme toggle button
-            const themeToggle = document.getElementById('theme-toggle');
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            
-            if (themeToggle && lightIcon && darkIcon) {
-                // Show correct icon based on current theme
-                if (document.documentElement.classList.contains('dark')) {
-                    lightIcon.classList.remove('hidden');
-                    darkIcon.classList.add('hidden');
-                } else {
-                    lightIcon.classList.add('hidden');
-                    darkIcon.classList.remove('hidden');
-                }
+        }
+        
+        // Data Storage Functions
+        function saveData() {
+            try {
+                const data = {
+                    fronts: state.fronts,
+                    density: state.density,
+                    trips: state.trips,
+                    delivery: state.delivery,
+                    potential: state.potential
+                };
                 
-                // Add click event
-                themeToggle.addEventListener('click', toggleDarkMode);
+                localStorage.setItem('safra-2025-data', JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                return false;
             }
         }
         
-        function toggleDarkMode() {
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                state.config.darkMode = false;
-                
-                if (lightIcon && darkIcon) {
-                    lightIcon.classList.add('hidden');
-                    darkIcon.classList.remove('hidden');
+        function loadSavedData() {
+            try {
+                const savedData = localStorage.getItem('safra-2025-data');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // Update state with saved data
+                    state.fronts = data.fronts;
+                    state.density = data.density;
+                    state.trips = data.trips;
+                    state.delivery = data.delivery;
+                    state.potential = data.potential;
+                    
+                    // Recalculate derived data
+                    calculateDelivery();
+                    calculateTwoHourTotals();
+                    
+                    // Update UI with loaded data
+                    if (state.currentPage === 'entrega-hora') {
+                        generateTimePeriodHTML();
+                    }
+                    
+                    updateUI();
+                    showToast('Dados carregados com sucesso!', 'success');
+                    return true;
                 }
-            } else {
-                document.documentElement.classList.add('dark');
-                state.config.darkMode = true;
-                
-                if (lightIcon && darkIcon) {
-                    lightIcon.classList.remove('hidden');
-                    darkIcon.classList.add('hidden');
-                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Erro ao carregar os dados salvos', 'error');
             }
             
-            // Update dark mode toggle in settings
+            return false;
+        }
+        
+        function saveConfig() {
+            try {
+                localStorage.setItem('safra-2025-config', JSON.stringify(state.config));
+                return true;
+            } catch (error) {
+                console.error('Error saving config:', error);
+                return false;
+            }
+        }
+        
+        function loadConfig() {
+            try {
+                const savedConfig = localStorage.getItem('safra-2025-config');
+                if (savedConfig) {
+                    const config = JSON.parse(savedConfig);
+                    state.config = { ...state.config, ...config };
+                    
+                    // Update UI with loaded config
+                    updateUIFromConfig();
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+            
+            return false;
+        }
+        
+        function updateUIFromConfig() {
+            const autoSaveToggle = document.getElementById('auto-save-toggle');
+            const autoSaveInterval = document.getElementById('auto-save-interval');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const alertThreshold = document.getElementById('alert-threshold');
+            const soundAlertToggle = document.getElementById('sound-alert-toggle');
+            const visualAlertToggle = document.getElementById('visual-alert-toggle');
+            
+            if (autoSaveToggle) autoSaveToggle.checked = state.config.autoSave;
+            if (autoSaveInterval) autoSaveInterval.value = state.config.autoSaveInterval;
             if (darkModeToggle) darkModeToggle.checked = state.config.darkMode;
+            if (alertThreshold) alertThreshold.value = state.config.alertThreshold;
+            if (soundAlertToggle) soundAlertToggle.checked = state.config.soundAlerts;
+            if (visualAlertToggle) visualAlertToggle.checked = state.config.visualAlerts;
             
-            // Update charts for dark mode
-            updateChartThemes();
-            
-            // Save config
-            saveConfig();
+            // Apply dark mode setting
+            updateDarkMode();
         }
         
-        function updateDarkMode() {
-            if (state.config.darkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+        function updateConfigFromUI() {
+            const autoSaveToggle = document.getElementById('auto-save-toggle');
+            const autoSaveInterval = document.getElementById('auto-save-interval');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const alertThreshold = document.getElementById('alert-threshold');
+            const soundAlertToggle = document.getElementById('sound-alert-toggle');
+            const visualAlertToggle = document.getElementById('visual-alert-toggle');
             
-            // Update icons
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            if (autoSaveToggle) state.config.autoSave = autoSaveToggle.checked;
+            if (autoSaveInterval) state.config.autoSaveInterval = parseInt(autoSaveInterval.value) || 5;
+            if (darkModeToggle) state.config.darkMode = darkModeToggle.checked;
+            if (alertThreshold) state.config.alertThreshold = parseInt(alertThreshold.value) || 10;
+            if (soundAlertToggle) state.config.soundAlerts = soundAlertToggle.checked;
+            if (visualAlertToggle) state.config.visualAlerts = visualAlertToggle.checked;
             
-            if (lightIcon && darkIcon) {
-                if (document.documentElement.classList.contains('dark')) {
-                    lightIcon.classList.remove('hidden');
-                    darkIcon.classList.add('hidden');
-                } else {
-                    lightIcon.classList.add('hidden');
-                    darkIcon.classList.remove('hidden');
+            // Apply dark mode setting
+            updateDarkMode();
+        }
+        
+        // Load Initial Data
+        function loadInitialData() {
+            // Example data for testing
+            for (const front of state.fronts) {
+                for (const hour of state.hours) {
+                    // Generate random data for demonstration
+                    state.density[front][hour] = Math.random() * 20 + 60; // Random density between 60-80
+                    state.trips[front][hour] = Math.floor(Math.random() * 10); // Random trips between 0-9
+                    
+                    // Only odd hours have potential
+                    if (hour % 2 !== 0) {
+                        state.potential[front][hour] = Math.floor(Math.random() * 50) + 50; // Random potential between 50-100
+                    }
                 }
             }
             
-            // Update charts for dark mode
-            updateChartThemes();
+            // Calculate delivery and two-hour totals
+            calculateDelivery();
+            calculateTwoHourTotals();
         }
-        
-        function updateChartThemes() {
-            // Update all charts to match the current theme
-            for (const chartKey in state.charts) {
-                if (state.charts[chartKey]) {
-                    updateChartTheme(state.charts[chartKey]);
-                }
-            }
-        }
-        
-        // Initialize the application
-        // This will be called when the document is ready
-        setupKeyboardShortcuts();
     </script>
 </body>
 </html>
