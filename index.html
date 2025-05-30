@@ -290,6 +290,22 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+
+        .calendar-day.has-data {
+            position: relative;
+        }
+        
+        .calendar-day.has-data::after {
+            content: "";
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background-color: #5D5CDE;
+            border-radius: 50%;
+        }
         
         /* Print styles */
         @media print {
@@ -354,6 +370,35 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Date navigation styles */
+        .date-nav-button {
+            transition: all 0.2s ease;
+        }
+        
+        .date-nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .date-nav-button:hover:not(:disabled) {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+        
+        .date-has-data {
+            position: relative;
+        }
+        
+        .date-has-data::after {
+            content: "";
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background-color: #10B981;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-200">
@@ -403,6 +448,14 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#" class="drawer-link flex items-center p-3 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" data-page="historico">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Histórico Diário
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="drawer-link flex items-center p-3 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" data-page="configuracoes">
                                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -447,6 +500,26 @@
                                 <div class="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-lg shadow-md">GG</div>
                                 <span class="ml-2 font-semibold text-xl text-gray-900 dark:text-gray-100 hidden sm:inline-block">GGOMES-LOG</span>
                             </div>
+                        </div>
+                        
+                        <!-- Center: Date Selector -->
+                        <div class="flex items-center space-x-2">
+                            <button id="prev-date-btn" class="date-nav-button p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button id="date-selector-btn" class="flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span id="current-date-display" class="text-sm font-medium">Carregando...</span>
+                            </button>
+                            <button id="next-date-btn" class="date-nav-button p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
                         </div>
                         
                         <!-- Right Side: Actions -->
@@ -651,6 +724,64 @@
                             <button type="button" id="search-cancel" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                                 Cancelar
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Date Selector Modal -->
+            <div id="date-selector-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+                <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                        <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
+                    </div>
+                    <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                        <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Selecionar Data</h3>
+                                <button id="close-date-selector-modal" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mb-4">
+                                <button id="prev-month-btn" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                                <div id="date-selector-month-year" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Julho 2025</div>
+                                <button id="next-month-btn" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <div>Dom</div>
+                                <div>Seg</div>
+                                <div>Ter</div>
+                                <div>Qua</div>
+                                <div>Qui</div>
+                                <div>Sex</div>
+                                <div>Sáb</div>
+                            </div>
+                            
+                            <div id="date-selector-days" class="grid grid-cols-7 gap-1 mt-2">
+                                <!-- Calendar days will be generated here -->
+                            </div>
+                            
+                            <div class="mt-6 flex justify-between">
+                                <button id="today-btn" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    Hoje
+                                </button>
+                                <button id="new-date-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                    Nova Data
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1007,6 +1138,115 @@
                         </div>
                     </div>
                     
+                    <!-- Histórico Diário Content -->
+                    <div id="historico-content" class="page-content hidden">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Histórico Diário de Entregas</h2>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Visualize o histórico de todos os dias com registros de entrega.</p>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                        <span id="history-month-year">Julho 2025</span>
+                                    </h3>
+                                    <div class="flex items-center space-x-2">
+                                        <button id="history-prev-month" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                            </svg>
+                                        </button>
+                                        <button id="history-next-month" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                                    <div>Dom</div>
+                                    <div>Seg</div>
+                                    <div>Ter</div>
+                                    <div>Qua</div>
+                                    <div>Qui</div>
+                                    <div>Sex</div>
+                                    <div>Sáb</div>
+                                </div>
+                                
+                                <div id="history-calendar" class="grid grid-cols-7 gap-2">
+                                    <!-- Calendar will be generated here -->
+                                </div>
+                                
+                                <div class="mt-6 flex items-center justify-between">
+                                    <div class="flex items-center space-x-6">
+                                        <div class="flex items-center">
+                                            <span class="inline-block w-3 h-3 rounded-full bg-primary mr-2"></span>
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Dia atual</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Com dados</span>
+                                        </div>
+                                    </div>
+                                    <button id="export-history" class="flex items-center text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-3 rounded transition duration-150 focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Exportar Histórico
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Daily Summary Table -->
+                            <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Sumário de Entregas Diárias</h3>
+                                    <select id="history-period-filter" class="text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-base">
+                                        <option value="all">Todos os períodos</option>
+                                        <option value="06-08">06:00-08:00</option>
+                                        <option value="08-10">08:00-10:00</option>
+                                        <option value="10-12">10:00-12:00</option>
+                                        <option value="12-14">12:00-14:00</option>
+                                        <option value="14-16">14:00-16:00</option>
+                                        <option value="16-18">16:00-18:00</option>
+                                        <option value="18-20">18:00-20:00</option>
+                                        <option value="20-22">20:00-22:00</option>
+                                        <option value="22-00">22:00-00:00</option>
+                                        <option value="00-02">00:00-02:00</option>
+                                        <option value="02-04">02:00-04:00</option>
+                                        <option value="04-06">04:00-06:00</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead class="bg-gray-50 dark:bg-gray-800">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Entregue</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Previsto</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Eficiência</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Viagens</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Densidade Média</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="history-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            <!-- Table rows will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div id="history-empty-state" class="py-12 text-center">
+                                    <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <p class="mt-4 text-gray-500 dark:text-gray-400">Nenhum registro de entrega encontrado para o período selecionado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Configurações Content -->
                     <div id="configuracoes-content" class="page-content hidden">
                         <div class="max-w-2xl mx-auto">
@@ -1108,13 +1348,13 @@
                 <div class="container mx-auto px-4 py-4">
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <div class="text-sm text-gray-600 dark:text-gray-400 mb-4 md:mb-0">
-                            © 2025 GGOMES-LOG - Gestão de Entrega de Cana
+                            © 2025 GGOMES-LOG - Gestão de Entrega de Safra
                         </div>
                         <div class="flex space-x-4">
                             <a href="#" class="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-300 transition-colors duration-150">Termos de Uso</a>
                             <a href="#" class="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-300 transition-colors duration-150">Política de Privacidade</a>
                             <a href="#" class="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-300 transition-colors duration-150">Suporte</a>
-                            <span class="text-sm text-gray-400 dark:text-gray-500">Versão 4.0.0</span>
+                            <span class="text-sm text-gray-400 dark:text-gray-500">Versão 5.0.0</span>
                         </div>
                     </div>
                 </div>
@@ -1295,13 +1535,17 @@
                     '04-06': [4, 5]
                 },
                 
-                // Delivery data
+                // Date tracking
+                currentDate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+                availableDates: [], // List of dates with data
+                
+                // Delivery data - organized by date
                 density: {},
                 trips: {},
                 delivery: {},
                 potential: {},
                 
-                // Period summaries
+                // Period summaries - organized by date
                 twoHourDelivery: {},
                 twoHourPotential: {},
                 difference: {},
@@ -1418,6 +1662,15 @@
                 elements.menuButton = document.getElementById('menu-button');
                 elements.drawerLinks = document.querySelectorAll('.drawer-link');
                 
+                // Date navigation elements
+                elements.currentDateDisplay = document.getElementById('current-date-display');
+                elements.prevDateBtn = document.getElementById('prev-date-btn');
+                elements.nextDateBtn = document.getElementById('next-date-btn');
+                elements.dateSelectorBtn = document.getElementById('date-selector-btn');
+                elements.dateSelectorModal = document.getElementById('date-selector-modal');
+                elements.dateSelectorDays = document.getElementById('date-selector-days');
+                elements.dateSelectorMonthYear = document.getElementById('date-selector-month-year');
+                
                 // Page elements
                 elements.pageTitle = document.getElementById('page-title');
                 elements.pageSubtitle = document.getElementById('page-subtitle');
@@ -1435,6 +1688,12 @@
                 elements.timePeriodContent = document.getElementById('time-period-content');
                 elements.loadingIndicator = document.getElementById('loading-indicator');
                 elements.timeTabButtons = document.querySelectorAll('.time-tab-btn');
+                
+                // History elements
+                elements.historyCalendar = document.getElementById('history-calendar');
+                elements.historyMonthYear = document.getElementById('history-month-year');
+                elements.historyTableBody = document.getElementById('history-table-body');
+                elements.historyEmptyState = document.getElementById('history-empty-state');
                 
                 // Modals
                 elements.searchModal = document.getElementById('search-modal');
@@ -1463,31 +1722,76 @@
             
             // Initialize data structures
             const initializeDataStructures = () => {
-                // Initialize delivery data structures
-                for (const front of state.fronts) {
-                    state.density[front] = {};
-                    state.trips[front] = {};
-                    state.delivery[front] = {};
-                    state.potential[front] = {};
+                // Initialize date entry for current date if it doesn't exist
+                if (!state.density[state.currentDate]) {
+                    state.density[state.currentDate] = {};
+                    state.trips[state.currentDate] = {};
+                    state.delivery[state.currentDate] = {};
+                    state.potential[state.currentDate] = {};
+                    state.twoHourDelivery[state.currentDate] = {};
+                    state.twoHourPotential[state.currentDate] = {};
+                    state.difference[state.currentDate] = {};
                     
-                    for (const hour of state.hours) {
-                        state.density[front][hour] = 0;
-                        state.trips[front][hour] = 0;
-                        state.delivery[front][hour] = 0;
-                        state.potential[front][hour] = 0;
+                    // Add to available dates
+                    if (!state.availableDates.includes(state.currentDate)) {
+                        state.availableDates.push(state.currentDate);
+                        state.availableDates.sort();
                     }
                 }
                 
-                // Initialize period summaries
+                // Initialize delivery data structures for current date
+                for (const front of state.fronts) {
+                    if (!state.density[state.currentDate][front]) {
+                        state.density[state.currentDate][front] = {};
+                    }
+                    if (!state.trips[state.currentDate][front]) {
+                        state.trips[state.currentDate][front] = {};
+                    }
+                    if (!state.delivery[state.currentDate][front]) {
+                        state.delivery[state.currentDate][front] = {};
+                    }
+                    if (!state.potential[state.currentDate][front]) {
+                        state.potential[state.currentDate][front] = {};
+                    }
+                    
+                    for (const hour of state.hours) {
+                        if (state.density[state.currentDate][front][hour] === undefined) {
+                            state.density[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.trips[state.currentDate][front][hour] === undefined) {
+                            state.trips[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.delivery[state.currentDate][front][hour] === undefined) {
+                            state.delivery[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.potential[state.currentDate][front][hour] === undefined) {
+                            state.potential[state.currentDate][front][hour] = 0;
+                        }
+                    }
+                }
+                
+                // Initialize period summaries for current date
                 for (const period in state.timePeriodsMap) {
-                    state.twoHourDelivery[period] = {};
-                    state.twoHourPotential[period] = {};
-                    state.difference[period] = {};
+                    if (!state.twoHourDelivery[state.currentDate][period]) {
+                        state.twoHourDelivery[state.currentDate][period] = {};
+                    }
+                    if (!state.twoHourPotential[state.currentDate][period]) {
+                        state.twoHourPotential[state.currentDate][period] = {};
+                    }
+                    if (!state.difference[state.currentDate][period]) {
+                        state.difference[state.currentDate][period] = {};
+                    }
                     
                     for (const front of state.fronts) {
-                        state.twoHourDelivery[period][front] = 0;
-                        state.twoHourPotential[period][front] = 0;
-                        state.difference[period][front] = 0;
+                        if (state.twoHourDelivery[state.currentDate][period][front] === undefined) {
+                            state.twoHourDelivery[state.currentDate][period][front] = 0;
+                        }
+                        if (state.twoHourPotential[state.currentDate][period][front] === undefined) {
+                            state.twoHourPotential[state.currentDate][period][front] = 0;
+                        }
+                        if (state.difference[state.currentDate][period][front] === undefined) {
+                            state.difference[state.currentDate][period][front] = 0;
+                        }
                     }
                 }
             };
@@ -1533,7 +1837,7 @@
                 elements.clearPeriodBtn?.addEventListener('click', () => {
                     showConfirmationModal(
                         'Limpar Período',
-                        `Tem certeza que deseja limpar todos os dados do período ${state.activePeriod}?`,
+                        `Tem certeza que deseja limpar todos os dados do período ${state.activePeriod} para a data ${formatDateDisplay(state.currentDate)}?`,
                         clearCurrentPeriod
                     );
                 });
@@ -1563,6 +1867,50 @@
                         this.classList.add('bg-primary', 'text-white');
                         this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
                     });
+                });
+                
+                // Date selector button
+                elements.dateSelectorBtn?.addEventListener('click', function() {
+                    showDateSelectorModal();
+                });
+                
+                // Previous date button
+                elements.prevDateBtn?.addEventListener('click', function() {
+                    navigateDate(-1);
+                });
+                
+                // Next date button
+                elements.nextDateBtn?.addEventListener('click', function() {
+                    navigateDate(1);
+                });
+                
+                // Date selector modal close button
+                document.getElementById('close-date-selector-modal')?.addEventListener('click', function() {
+                    toggleModal(elements.dateSelectorModal, false);
+                });
+                
+                // Date selector month navigation
+                document.getElementById('prev-month-btn')?.addEventListener('click', function() {
+                    navigateDateSelectorMonth(-1);
+                });
+                
+                document.getElementById('next-month-btn')?.addEventListener('click', function() {
+                    navigateDateSelectorMonth(1);
+                });
+                
+                // Today button
+                document.getElementById('today-btn')?.addEventListener('click', function() {
+                    const today = new Date().toISOString().split('T')[0];
+                    changeCurrentDate(today);
+                    toggleModal(elements.dateSelectorModal, false);
+                });
+                
+                // New date button
+                document.getElementById('new-date-btn')?.addEventListener('click', function() {
+                    const date = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1);
+                    const newDate = date.toISOString().split('T')[0];
+                    changeCurrentDate(newDate);
+                    toggleModal(elements.dateSelectorModal, false);
                 });
                 
                 // Custom date range
@@ -1686,10 +2034,10 @@
                         showToast('Dados salvos com sucesso!', 'success');
                     }
                     
-                    // Alt + 1-5 for navigation
-                    if (e.altKey && !isNaN(parseInt(e.key)) && parseInt(e.key) >= 1 && parseInt(e.key) <= 5) {
+                    // Alt + 1-6 for navigation
+                    if (e.altKey && !isNaN(parseInt(e.key)) && parseInt(e.key) >= 1 && parseInt(e.key) <= 6) {
                         e.preventDefault();
-                        const pages = ['dashboard', 'entrega-hora', 'relatorios', 'metas', 'configuracoes'];
+                        const pages = ['dashboard', 'entrega-hora', 'relatorios', 'metas', 'historico', 'configuracoes'];
                         const index = parseInt(e.key) - 1;
                         
                         if (index < pages.length) {
@@ -1703,6 +2051,18 @@
                         toggleDarkMode();
                     }
                     
+                    // Alt + Left Arrow for previous day
+                    if (e.altKey && e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        navigateDate(-1);
+                    }
+                    
+                    // Alt + Right Arrow for next day
+                    if (e.altKey && e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        navigateDate(1);
+                    }
+                    
                     // Escape to close modals
                     if (e.key === 'Escape') {
                         const activeModals = document.querySelectorAll('.fixed.inset-0:not(.hidden)');
@@ -1711,6 +2071,7 @@
                             activeModals.forEach(modal => {
                                 if (modal.id === 'search-modal') toggleModal(elements.searchModal, false);
                                 if (modal.id === 'calendar-modal') toggleModal(elements.calendarModal, false);
+                                if (modal.id === 'date-selector-modal') toggleModal(elements.dateSelectorModal, false);
                                 if (modal.id === 'manage-fronts-modal') toggleModal(elements.manageFrontsModal, false);
                                 if (modal.id === 'confirmation-modal') toggleModal(elements.confirmationModal, false);
                             });
@@ -1747,6 +2108,23 @@
                         }
                     });
                 }
+                
+                // History navigation
+                document.getElementById('history-prev-month')?.addEventListener('click', function() {
+                    navigateHistoryMonth(-1);
+                });
+                
+                document.getElementById('history-next-month')?.addEventListener('click', function() {
+                    navigateHistoryMonth(1);
+                });
+                
+                // History period filter
+                document.getElementById('history-period-filter')?.addEventListener('change', function() {
+                    updateHistoryTable();
+                });
+                
+                // Export history
+                document.getElementById('export-history')?.addEventListener('click', exportHistoryData);
                 
                 // Dark mode detection
                 if (window.matchMedia) {
@@ -1870,6 +2248,10 @@
                             elements.pageTitle.textContent = 'Metas e Desempenho';
                             elements.pageSubtitle.textContent = 'Acompanhe o progresso das metas estabelecidas';
                             break;
+                        case 'historico':
+                            elements.pageTitle.textContent = 'Histórico Diário';
+                            elements.pageSubtitle.textContent = 'Visualize e compare dados de dias anteriores';
+                            break;
                         case 'configuracoes':
                             elements.pageTitle.textContent = 'Configurações';
                             elements.pageSubtitle.textContent = 'Ajuste as configurações do sistema';
@@ -1896,6 +2278,12 @@
                     if (page === 'dashboard') {
                         updateDashboardCharts();
                         updateDetailedFrontTable();
+                    }
+                    
+                    // If showing the history page, update the history calendar and table
+                    if (page === 'historico') {
+                        updateHistoryCalendar();
+                        updateHistoryTable();
                     }
                 } else {
                     // If page doesn't exist, show dashboard
@@ -1943,33 +2331,239 @@
                 if (darkModeCheckbox) darkModeCheckbox.checked = isDark;
             };
             
-            // Calculate delivery based on density and trips
+            // Show date selector modal
+            const showDateSelectorModal = () => {
+                if (!elements.dateSelectorModal) return;
+                
+                // Set current month and year to match the currently selected date
+                const [year, month] = state.currentDate.split('-');
+                state.calendar.currentMonth = parseInt(month) - 1;
+                state.calendar.currentYear = parseInt(year);
+                
+                // Generate days for date selector
+                generateDateSelectorDays();
+                
+                // Show the modal
+                toggleModal(elements.dateSelectorModal, true);
+            };
+            
+            // Generate days for date selector calendar
+            const generateDateSelectorDays = () => {
+                if (!elements.dateSelectorDays || !elements.dateSelectorMonthYear) return;
+                
+                // Clear previous calendar
+                elements.dateSelectorDays.innerHTML = '';
+                
+                // Set month and year display
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                elements.dateSelectorMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
+                const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
+                
+                // Add empty cells for days before the first day of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'h-10';
+                    elements.dateSelectorDays.appendChild(emptyCell);
+                }
+                
+                // Add days
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+                    currentDate.setHours(0, 0, 0, 0);
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    
+                    dayCell.className = 'calendar-day h-10 flex items-center justify-center rounded-full cursor-pointer';
+                    
+                    // Highlight current date
+                    if (dateStr === state.currentDate) {
+                        dayCell.classList.add('bg-primary', 'text-white');
+                    }
+                    
+                    // Highlight today
+                    if (currentDate.getTime() === today.getTime()) {
+                        dayCell.classList.add('border-2', 'border-primary');
+                    }
+                    
+                    // Mark dates with data
+                    if (state.availableDates.includes(dateStr)) {
+                        dayCell.classList.add('has-data');
+                    }
+                    
+                    dayCell.textContent = day;
+                    dayCell.setAttribute('data-date', dateStr);
+                    
+                    // Add click event to select date
+                    dayCell.addEventListener('click', function() {
+                        const selectedDate = this.getAttribute('data-date');
+                        if (selectedDate) {
+                            changeCurrentDate(selectedDate);
+                            toggleModal(elements.dateSelectorModal, false);
+                        }
+                    });
+                    
+                    elements.dateSelectorDays.appendChild(dayCell);
+                }
+            };
+            
+            // Navigate date selector month
+            const navigateDateSelectorMonth = (direction) => {
+                state.calendar.currentMonth += direction;
+                if (state.calendar.currentMonth > 11) {
+                    state.calendar.currentMonth = 0;
+                    state.calendar.currentYear++;
+                } else if (state.calendar.currentMonth < 0) {
+                    state.calendar.currentMonth = 11;
+                    state.calendar.currentYear--;
+                }
+                
+                generateDateSelectorDays();
+            };
+            
+            // Navigate to previous or next date
+            const navigateDate = (direction) => {
+                // Get current date as Date object
+                const currentDate = new Date(state.currentDate);
+                
+                // Add or subtract days
+                currentDate.setDate(currentDate.getDate() + direction);
+                
+                // Convert back to YYYY-MM-DD format
+                const newDate = currentDate.toISOString().split('T')[0];
+                
+                // Change current date
+                changeCurrentDate(newDate);
+            };
+            
+            // Change current date
+            const changeCurrentDate = (newDate) => {
+                // Store the old date
+                const oldDate = state.currentDate;
+                
+                // Update current date
+                state.currentDate = newDate;
+                
+                // Initialize data structures for the new date if they don't exist
+                initializeDataStructures();
+                
+                // Update date display
+                updateDateDisplay();
+                
+                // Regenerate time period HTML if on that page
+                if (state.currentPage === 'entrega-hora') {
+                    generateTimePeriodHTML();
+                }
+                
+                // Update dashboard if on that page
+                if (state.currentPage === 'dashboard') {
+                    updateDashboardCharts();
+                    updateDetailedFrontTable();
+                }
+                
+                // Update date navigation buttons
+                updateDateNavigationButtons();
+                
+                // Show a toast notification
+                if (oldDate !== newDate) {
+                    const formattedDate = formatDateDisplay(newDate);
+                    showToast(`Data alterada para ${formattedDate}`, 'info');
+                }
+            };
+            
+            // Update date display
+            const updateDateDisplay = () => {
+                if (elements.currentDateDisplay) {
+                    elements.currentDateDisplay.textContent = formatDateDisplay(state.currentDate);
+                }
+                
+                // Update header date (current system date)
+                const headerDate = document.getElementById('header-date');
+                if (headerDate) {
+                    const now = new Date();
+                    const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+                    const formattedDate = now.toLocaleDateString('pt-BR', dateOptions);
+                    headerDate.textContent = formattedDate;
+                }
+            };
+            
+            // Update date navigation buttons
+            const updateDateNavigationButtons = () => {
+                // Disable/enable previous date button based on available dates
+                if (elements.prevDateBtn) {
+                    const prevDate = new Date(state.currentDate);
+                    prevDate.setDate(prevDate.getDate() - 1);
+                    const prevDateStr = prevDate.toISOString().split('T')[0];
+                    elements.prevDateBtn.disabled = false;
+                }
+                
+                // Next date button should never go beyond today
+                if (elements.nextDateBtn) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const currentDate = new Date(state.currentDate);
+                    currentDate.setHours(0, 0, 0, 0);
+                    
+                    elements.nextDateBtn.disabled = currentDate >= today;
+                }
+            };
+            
+            // Format date for display (DD/MM/YYYY)
+            const formatDateDisplay = (dateStr) => {
+                if (!dateStr) return '';
+                
+                const date = new Date(dateStr);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                
+                // Get day of week
+                const weekdays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const dayOfWeek = weekdays[date.getDay()];
+                
+                return `${dayOfWeek}, ${day}/${month}/${year}`;
+            };
+            
+            // Calculate delivery based on density and trips for the current date
             const calculateDelivery = () => {
                 for (const front of state.fronts) {
                     for (const hour of state.hours) {
-                        state.delivery[front][hour] = state.density[front][hour] * state.trips[front][hour];
+                        if (state.density[state.currentDate] && 
+                            state.density[state.currentDate][front] && 
+                            state.trips[state.currentDate] && 
+                            state.trips[state.currentDate][front]) {
+                            state.delivery[state.currentDate][front][hour] = 
+                                state.density[state.currentDate][front][hour] * state.trips[state.currentDate][front][hour];
+                        }
                     }
                 }
             };
             
-            // Calculate two-hour totals for periods
+            // Calculate two-hour totals for periods for the current date
             const calculateTwoHourTotals = () => {
                 for (const period in state.timePeriodsMap) {
                     const hours = state.timePeriodsMap[period];
                     
                     for (const front of state.fronts) {
                         // Calculate two-hour delivery total
-                        state.twoHourDelivery[period][front] = hours.reduce((sum, hour) => {
-                            return sum + state.delivery[front][hour];
+                        state.twoHourDelivery[state.currentDate][period][front] = hours.reduce((sum, hour) => {
+                            return sum + (state.delivery[state.currentDate][front][hour] || 0);
                         }, 0);
                         
                         // Calculate two-hour potential (use the odd hour's potential * 2)
                         const oddHour = hours.find(h => h % 2 !== 0) || hours[0];
-                        state.twoHourPotential[period][front] = state.potential[front][oddHour] * 2;
+                        state.twoHourPotential[state.currentDate][period][front] = 
+                            (state.potential[state.currentDate][front][oddHour] || 0) * 2;
                         
                         // Calculate difference
-                        state.difference[period][front] = 
-                            state.twoHourDelivery[period][front] - state.twoHourPotential[period][front];
+                        state.difference[state.currentDate][period][front] = 
+                            state.twoHourDelivery[state.currentDate][period][front] - 
+                            state.twoHourPotential[state.currentDate][period][front];
                     }
                 }
             };
@@ -2036,22 +2630,27 @@
                                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">`;
                         
                         for (const front of state.fronts) {
+                            const densityValue = state.density[state.currentDate]?.[front]?.[hour] || 0;
+                            const tripsValue = state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                            const deliveryValue = state.delivery[state.currentDate]?.[front]?.[hour] || 0;
+                            const potentialValue = state.potential[state.currentDate]?.[front]?.[hour] || 0;
+                            
                             periodHTML += `
                                         <tr>
                                             <td class="px-4 py-3 whitespace-nowrap">
                                                 <span class="font-medium">F${front}</span>
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap">
-                                                <input type="number" class="input-number densidade w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${state.density[front][hour]}" min="0" step="0.01">
+                                                <input type="number" class="input-number densidade w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${densityValue}" min="0" step="0.01">
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap">
-                                                <input type="number" class="input-number viagens w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${state.trips[front][hour]}" min="0">
+                                                <input type="number" class="input-number viagens w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${tripsValue}" min="0">
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap">
-                                                <span class="entrega font-medium ${state.delivery[front][hour] > 0 ? 'text-success-600 dark:text-success-400' : ''}" data-hour="${hour}" data-front="${front}">${state.delivery[front][hour].toFixed(2)}</span>
+                                                <span class="entrega font-medium ${deliveryValue > 0 ? 'text-success-600 dark:text-success-400' : ''}" data-hour="${hour}" data-front="${front}">${deliveryValue.toFixed(2)}</span>
                                             </td>
                                             ${hasPotencial ? `<td class="px-4 py-3 whitespace-nowrap">
-                                                <input type="number" class="input-number potencial w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${state.potential[front][hour]}" min="0">
+                                                <input type="number" class="input-number potencial w-20 text-right border rounded px-2 py-1 dark:bg-gray-700 text-base" data-hour="${hour}" data-front="${front}" value="${potentialValue}" min="0">
                                             </td>` : ''}
                                         </tr>`;
                         }
@@ -2099,34 +2698,52 @@
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">`;
                     
                     for (const front of state.fronts) {
+                        const twoHourDelivery = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        const twoHourPotential = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        const difference = state.difference[state.currentDate]?.[period]?.[front] || 0;
+                        const percentage = twoHourPotential > 0 ? (twoHourDelivery / twoHourPotential) * 100 : 0;
+                        
                         periodHTML += `
                                     <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap font-medium">F${front}</td>
-                                        <td class="px-4 py-3 whitespace-nowrap duas-horas" data-period="${period}" data-front="${front}">0.00</td>
-                                        <td class="px-4 py-3 whitespace-nowrap potencial-2h" data-period="${period}" data-front="${front}">0</td>
-                                        <td class="px-4 py-3 whitespace-nowrap diff" data-period="${period}" data-front="${front}">0.00</td>
+                                        <td class="px-4 py-3 whitespace-nowrap font-semibold">F${front}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap duas-horas" data-period="${period}" data-front="${front}">${twoHourDelivery.toFixed(2)}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap potencial-2h" data-period="${period}" data-front="${front}">${twoHourPotential}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap diff ${difference < 0 ? 'text-red-600 dark:text-red-400' : (difference > 0 ? 'text-green-600 dark:text-green-400' : '')}" data-period="${period}" data-front="${front}">${difference.toFixed(2)}</td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 relative overflow-hidden">
-                                                <div class="percent-bar bg-primary h-2.5 rounded-full" data-period="${period}" data-front="${front}" style="width: 0%"></div>
+                                                <div class="percent-bar ${getProgressBarColor(percentage)} h-2.5 rounded-full" data-period="${period}" data-front="${front}" style="width: ${Math.min(100, percentage)}%"></div>
                                             </div>
-                                            <span class="text-xs mt-1 block text-right percent-text" data-period="${period}" data-front="${front}">0%</span>
+                                            <span class="text-xs mt-1 block text-right percent-text" data-period="${period}" data-front="${front}">${percentage.toFixed(1)}%</span>
                                         </td>
                                     </tr>`;
                     }
+                    
+                    // Calculate period totals
+                    let totalTwoHourDelivery = 0;
+                    let totalTwoHourPotential = 0;
+                    let totalDifference = 0;
+                    
+                    for (const front of state.fronts) {
+                        totalTwoHourDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        totalTwoHourPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        totalDifference += state.difference[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    const totalPercentage = totalTwoHourPotential > 0 ? (totalTwoHourDelivery / totalTwoHourPotential) * 100 : 0;
                     
                     periodHTML += `
                                 </tbody>
                                 <tfoot class="bg-gray-50 dark:bg-gray-700 font-semibold">
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">TOTAL</td>
-                                        <td class="px-4 py-3 whitespace-nowrap total-duas-horas" data-period="${period}">0.00</td>
-                                        <td class="px-4 py-3 whitespace-nowrap total-potencial-2h" data-period="${period}">0</td>
-                                        <td class="px-4 py-3 whitespace-nowrap total-diff" data-period="${period}">0.00</td>
+                                        <td class="px-4 py-3 whitespace-nowrap total-duas-horas" data-period="${period}">${totalTwoHourDelivery.toFixed(2)}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap total-potencial-2h" data-period="${period}">${totalTwoHourPotential}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap total-diff ${totalDifference < 0 ? 'text-red-600 dark:text-red-400' : (totalDifference > 0 ? 'text-green-600 dark:text-green-400' : '')}" data-period="${period}">${totalDifference.toFixed(2)}</td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 relative overflow-hidden">
-                                                <div class="total-percent-bar bg-primary h-2.5 rounded-full" data-period="${period}" style="width: 0%"></div>
+                                                <div class="total-percent-bar ${getProgressBarColor(totalPercentage)} h-2.5 rounded-full" data-period="${period}" style="width: ${Math.min(100, totalPercentage)}%"></div>
                                             </div>
-                                            <span class="text-xs mt-1 block text-right total-percent-text" data-period="${period}">0%</span>
+                                            <span class="text-xs mt-1 block text-right total-percent-text" data-period="${period}">${totalPercentage.toFixed(1)}%</span>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -2178,19 +2795,25 @@
                 const value = parseFloat(e.target.value) || 0;
                 
                 if (e.target.classList.contains('densidade')) {
-                    state.density[front][hour] = value;
+                    state.density[state.currentDate][front][hour] = value;
                 } else if (e.target.classList.contains('viagens')) {
-                    state.trips[front][hour] = value;
+                    state.trips[state.currentDate][front][hour] = value;
                 } else if (e.target.classList.contains('potencial')) {
-                    state.potential[front][hour] = value;
+                    state.potential[state.currentDate][front][hour] = value;
                 }
                 
                 calculateDelivery();
                 calculateTwoHourTotals();
                 updateUI();
                 
+                // Add current date to available dates if not already there
+                if (!state.availableDates.includes(state.currentDate)) {
+                    state.availableDates.push(state.currentDate);
+                    state.availableDates.sort();
+                }
+                
                 // Add to history for undo/redo
-                addToHistory('data-change', { hour, front, field: e.target.classList[1], value });
+                addToHistory('data-change', { date: state.currentDate, hour, front, field: e.target.classList[1], value });
             };
             
             // Update UI
@@ -2210,7 +2833,7 @@
                 document.querySelectorAll('.entrega').forEach(element => {
                     const hour = parseInt(element.getAttribute('data-hour'));
                     const front = element.getAttribute('data-front');
-                    const value = state.delivery[front][hour];
+                    const value = state.delivery[state.currentDate]?.[front]?.[hour] || 0;
                     element.textContent = value.toFixed(2);
                     
                     // Add color based on value
@@ -2229,22 +2852,29 @@
                     const totalTripsBadge = document.querySelector(`.total-viagens-badge[data-hour="${hour}"]`);
                     const totalEntregaBadge = document.querySelector(`.total-entrega-badge[data-hour="${hour}"]`);
                     
+                    let totalTrips = 0;
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    
+                    for (const front of state.fronts) {
+                        totalTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        totalDelivery += state.delivery[state.currentDate]?.[front]?.[hour] || 0;
+                        if (hour % 2 !== 0) { // Only odd hours have potential
+                            totalPotential += state.potential[state.currentDate]?.[front]?.[hour] || 0;
+                        }
+                    }
+                    
                     if (totalTripsElement || totalTripsBadge) {
-                        const totalTrips = state.fronts.reduce((sum, front) => sum + state.trips[front][hour], 0);
-                        
                         if (totalTripsElement) totalTripsElement.textContent = totalTrips;
                         if (totalTripsBadge) totalTripsBadge.textContent = totalTrips;
                     }
                     
                     if (totalDeliveryElement || totalEntregaBadge) {
-                        const totalDelivery = state.fronts.reduce((sum, front) => sum + state.delivery[front][hour], 0);
-                        
                         if (totalDeliveryElement) totalDeliveryElement.textContent = totalDelivery.toFixed(2);
                         if (totalEntregaBadge) totalEntregaBadge.textContent = totalDelivery.toFixed(2);
                     }
                     
                     if (totalPotentialElement && hour % 2 !== 0) { // Only odd hours have potential
-                        const totalPotential = state.fronts.reduce((sum, front) => sum + state.potential[front][hour], 0);
                         totalPotentialElement.textContent = totalPotential;
                     }
                 }
@@ -2258,42 +2888,32 @@
                         const percentBar = document.querySelector(`.percent-bar[data-period="${period}"][data-front="${front}"]`);
                         const percentText = document.querySelector(`.percent-text[data-period="${period}"][data-front="${front}"]`);
                         
+                        const twoHourDelivery = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        const twoHourPotential = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        const difference = state.difference[state.currentDate]?.[period]?.[front] || 0;
+                        
                         if (duasHorasElement && potencial2hElement && diffElement) {
-                            duasHorasElement.textContent = state.twoHourDelivery[period][front].toFixed(2);
-                            potencial2hElement.textContent = state.twoHourPotential[period][front];
-                            diffElement.textContent = state.difference[period][front].toFixed(2);
+                            duasHorasElement.textContent = twoHourDelivery.toFixed(2);
+                            potencial2hElement.textContent = twoHourPotential;
+                            diffElement.textContent = difference.toFixed(2);
                             
                             // Color-code differences
                             diffElement.classList.remove('text-red-600', 'dark:text-red-400', 'text-green-600', 'dark:text-green-400');
-                            if (state.difference[period][front] < 0) {
+                            if (difference < 0) {
                                 diffElement.classList.add('text-red-600', 'dark:text-red-400');
-                            } else if (state.difference[period][front] > 0) {
+                            } else if (difference > 0) {
                                 diffElement.classList.add('text-green-600', 'dark:text-green-400');
                             }
                             
                             // Update percentage bar
                             if (percentBar && percentText) {
-                                const potential = state.twoHourPotential[period][front];
-                                const actual = state.twoHourDelivery[period][front];
+                                const percentage = twoHourPotential > 0 ? (twoHourDelivery / twoHourPotential) * 100 : 0;
                                 
-                                let percentage = potential > 0 ? (actual / potential) * 100 : 0;
-                                percentage = Math.min(percentage, 100); // Cap at 100%
-                                
-                                percentBar.style.width = `${percentage}%`;
+                                percentBar.style.width = `${Math.min(percentage, 100)}%`;
                                 percentText.textContent = `${percentage.toFixed(1)}%`;
                                 
-                                // Color the bar based on percentage
-                                percentBar.classList.remove('bg-primary', 'bg-green-500', 'bg-yellow-500', 'bg-red-500');
-                                
-                                if (percentage >= 90) {
-                                    percentBar.classList.add('bg-green-500');
-                                } else if (percentage >= 75) {
-                                    percentBar.classList.add('bg-primary');
-                                } else if (percentage >= 50) {
-                                    percentBar.classList.add('bg-yellow-500');
-                                } else {
-                                    percentBar.classList.add('bg-red-500');
-                                }
+                                // Update color based on percentage
+                                percentBar.className = `percent-bar ${getProgressBarColor(percentage)} h-2.5 rounded-full`;
                             }
                         }
                     }
@@ -2306,15 +2926,15 @@
                     const totalPercentText = document.querySelector(`.total-percent-text[data-period="${period}"]`);
                     
                     if (totalDuasHorasElement && totalPotencial2hElement && totalDiffElement) {
-                        const totalDuasHoras = state.fronts.reduce(
-                            (sum, front) => sum + state.twoHourDelivery[period][front], 0
-                        );
-                        const totalPotencial2h = state.fronts.reduce(
-                            (sum, front) => sum + state.twoHourPotential[period][front], 0
-                        );
-                        const totalDiff = state.fronts.reduce(
-                            (sum, front) => sum + state.difference[period][front], 0
-                        );
+                        let totalDuasHoras = 0;
+                        let totalPotencial2h = 0;
+                        
+                        for (const front of state.fronts) {
+                            totalDuasHoras += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                            totalPotencial2h += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        }
+                        
+                        const totalDiff = totalDuasHoras - totalPotencial2h;
                         
                         totalDuasHorasElement.textContent = totalDuasHoras.toFixed(2);
                         totalPotencial2hElement.textContent = totalPotencial2h;
@@ -2330,24 +2950,13 @@
                         
                         // Update total percentage bar
                         if (totalPercentBar && totalPercentText) {
-                            let percentage = totalPotencial2h > 0 ? (totalDuasHoras / totalPotencial2h) * 100 : 0;
-                            percentage = Math.min(percentage, 100); // Cap at 100%
+                            const percentage = totalPotencial2h > 0 ? (totalDuasHoras / totalPotencial2h) * 100 : 0;
                             
-                            totalPercentBar.style.width = `${percentage}%`;
+                            totalPercentBar.style.width = `${Math.min(percentage, 100)}%`;
                             totalPercentText.textContent = `${percentage.toFixed(1)}%`;
                             
-                            // Color the bar based on percentage
-                            totalPercentBar.classList.remove('bg-primary', 'bg-green-500', 'bg-yellow-500', 'bg-red-500');
-                            
-                            if (percentage >= 90) {
-                                totalPercentBar.classList.add('bg-green-500');
-                            } else if (percentage >= 75) {
-                                totalPercentBar.classList.add('bg-primary');
-                            } else if (percentage >= 50) {
-                                totalPercentBar.classList.add('bg-yellow-500');
-                            } else {
-                                totalPercentBar.classList.add('bg-red-500');
-                            }
+                            // Update color based on percentage
+                            totalPercentBar.className = `total-percent-bar ${getProgressBarColor(percentage)} h-2.5 rounded-full`;
                         }
                     }
                 }
@@ -2841,11 +3450,11 @@
                 let chartData;
                 
                 if (viewMode === 'percentage') {
-                    // Calculate total delivery
+                    // Calculate total delivery for current date
                     const totalDelivery = state.fronts.reduce((total, front) => {
                         let frontTotal = 0;
                         for (const hour of state.hours) {
-                            frontTotal += state.delivery[front][hour];
+                            frontTotal += state.delivery[state.currentDate]?.[front]?.[hour] || 0;
                         }
                         return total + frontTotal;
                     }, 0);
@@ -2854,7 +3463,7 @@
                     chartData = state.fronts.map(front => {
                         let frontTotal = 0;
                         for (const hour of state.hours) {
-                            frontTotal += state.delivery[front][hour];
+                            frontTotal += state.delivery[state.currentDate]?.[front]?.[hour] || 0;
                         }
                         return totalDelivery > 0 ? (frontTotal / totalDelivery) * 100 : 0;
                     });
@@ -2866,7 +3475,7 @@
                     chartData = state.fronts.map(front => {
                         let frontTotal = 0;
                         for (const hour of state.hours) {
-                            frontTotal += state.delivery[front][hour];
+                            frontTotal += state.delivery[state.currentDate]?.[front]?.[hour] || 0;
                         }
                         return frontTotal;
                     });
@@ -2957,19 +3566,14 @@
                     });
                     
                     const deliveryData = periods.map(period => {
-                        const hours = state.timePeriodsMap[period];
                         return state.fronts.reduce((sum, front) => {
-                            return sum + hours.reduce((hourSum, hour) => {
-                                return hourSum + state.delivery[front][hour];
-                            }, 0);
+                            return sum + (state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0);
                         }, 0);
                     });
                     
                     const potentialData = periods.map(period => {
-                        const hours = state.timePeriodsMap[period];
-                        const oddHour = hours.find(h => h % 2 !== 0) || hours[0];
                         return state.fronts.reduce((sum, front) => {
-                            return sum + (state.potential[front][oddHour] * 2);
+                            return sum + (state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0);
                         }, 0);
                     });
                     
@@ -2995,18 +3599,11 @@
                         
                         // Calculate total delivery for all periods
                         for (const period in state.timePeriodsMap) {
-                            const hours = state.timePeriodsMap[period];
-                            
                             // Sum delivery for this period
-                            for (const hour of hours) {
-                                totalDelivery += state.delivery[front][hour];
-                            }
+                            totalDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
                             
-                            // Sum potential for this period (only odd hours have potential)
-                            const oddHour = hours.find(h => h % 2 !== 0);
-                            if (oddHour && state.potential[front][oddHour]) {
-                                totalPotential += state.potential[front][oddHour] * 2;
-                            }
+                            // Sum potential for this period
+                            totalPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
                         }
                         
                         return totalPotential > 0 ? Math.round((totalDelivery / totalPotential) * 100) : 0;
@@ -3030,7 +3627,9 @@
                     
                     // Calculate total trips for each front
                     const tripsData = state.fronts.map(front => {
-                        return state.hours.reduce((sum, hour) => sum + state.trips[front][hour], 0);
+                        return state.hours.reduce((sum, hour) => {
+                            return sum + (state.trips[state.currentDate]?.[front]?.[hour] || 0);
+                        }, 0);
                     });
                     
                     // Update analytics data
@@ -3049,9 +3648,11 @@
                     
                     // Calculate average trucks per hour for each front
                     const trucksData = state.fronts.map(front => {
-                        const totalTrips = state.hours.reduce((sum, hour) => sum + state.trips[front][hour], 0);
+                        const totalTrips = state.hours.reduce((sum, hour) => {
+                            return sum + (state.trips[state.currentDate]?.[front]?.[hour] || 0);
+                        }, 0);
                         // Assuming 24 active hours for the average calculation
-                        const activeHours = state.hours.filter(hour => state.trips[front][hour] > 0).length || 1;
+                        const activeHours = state.hours.filter(hour => (state.trips[state.currentDate]?.[front]?.[hour] || 0) > 0).length || 1;
                         return totalTrips / activeHours;
                     });
                     
@@ -3077,44 +3678,38 @@
             
             // Update dashboard stats cards with real data
             const updateDashboardStatsCards = () => {
-                // Calculate total delivery across all fronts and hours
-                const totalDelivery = Object.keys(state.delivery).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.delivery[front]).reduce((hourSum, hour) => {
-                        return hourSum + state.delivery[front][hour];
+                // Calculate total delivery across all fronts and hours for current date
+                const totalDelivery = Object.keys(state.delivery[state.currentDate] || {}).reduce((frontSum, front) => {
+                    return frontSum + Object.keys(state.delivery[state.currentDate][front] || {}).reduce((hourSum, hour) => {
+                        return hourSum + (state.delivery[state.currentDate][front][hour] || 0);
                     }, 0);
                 }, 0);
                 
-                // Calculate total potential
-                const totalPotential = Object.keys(state.potential).reduce((frontSum, front) => {
-                    let frontPotential = 0;
-                    for (const period in state.timePeriodsMap) {
-                        const hours = state.timePeriodsMap[period];
-                        const oddHour = hours.find(h => h % 2 !== 0);
-                        if (oddHour && state.potential[front][oddHour]) {
-                            frontPotential += state.potential[front][oddHour] * 2;
-                        }
-                    }
-                    return frontSum + frontPotential;
+                // Calculate total potential for current date
+                const totalPotential = Object.keys(state.twoHourPotential[state.currentDate] || {}).reduce((periodSum, period) => {
+                    return periodSum + Object.keys(state.twoHourPotential[state.currentDate][period] || {}).reduce((frontSum, front) => {
+                        return frontSum + (state.twoHourPotential[state.currentDate][period][front] || 0);
+                    }, 0);
                 }, 0);
                 
                 // Calculate efficiency
                 const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
                 
-                // Calculate total trips
-                const totalTrips = Object.keys(state.trips).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.trips[front]).reduce((hourSum, hour) => {
-                        return hourSum + state.trips[front][hour];
+                // Calculate total trips for current date
+                const totalTrips = Object.keys(state.trips[state.currentDate] || {}).reduce((frontSum, front) => {
+                    return frontSum + Object.keys(state.trips[state.currentDate][front] || {}).reduce((hourSum, hour) => {
+                        return hourSum + (state.trips[state.currentDate][front][hour] || 0);
                     }, 0);
                 }, 0);
                 
-                // Calculate average density
+                // Calculate average density for current date
                 let densitySum = 0;
                 let densityCount = 0;
                 
-                for (const front in state.density) {
-                    for (const hour in state.density[front]) {
-                        if (state.density[front][hour] > 0) {
-                            densitySum += state.density[front][hour];
+                for (const front in state.density[state.currentDate] || {}) {
+                    for (const hour in state.density[state.currentDate][front] || {}) {
+                        if ((state.density[state.currentDate][front][hour] || 0) > 0) {
+                            densitySum += state.density[state.currentDate][front][hour];
                             densityCount++;
                         }
                     }
@@ -3188,32 +3783,29 @@
                 
                 // Add rows for each front
                 state.fronts.forEach(front => {
-                    // Calculate front total delivery
+                    // Calculate front total delivery for current date
                     let frontDelivery = 0;
                     let frontPotential = 0;
                     let frontTrips = 0;
                     let frontDensitySum = 0;
                     let frontDensityCount = 0;
                     
-                    // Calculate totals across all periods
+                    // Calculate totals across all periods for current date
                     for (const period in state.timePeriodsMap) {
-                        const hours = state.timePeriodsMap[period];
+                        // Sum delivery for this period
+                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
                         
-                        // Sum delivery and trips for this period
-                        for (const hour of hours) {
-                            frontDelivery += state.delivery[front][hour] || 0;
-                            frontTrips += state.trips[front][hour] || 0;
-                            
-                            if (state.density[front][hour] > 0) {
-                                frontDensitySum += state.density[front][hour];
-                                frontDensityCount++;
-                            }
-                        }
+                        // Sum potential for this period
+                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    // Calculate trips and density for current date
+                    for (const hour of state.hours) {
+                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
                         
-                        // Sum potential for this period (only odd hours have potential)
-                        const oddHour = hours.find(h => h % 2 !== 0);
-                        if (oddHour && state.potential[front][oddHour]) {
-                            frontPotential += state.potential[front][oddHour] * 2;
+                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                            frontDensitySum += state.density[state.currentDate][front][hour];
+                            frontDensityCount++;
                         }
                     }
                     
@@ -3351,19 +3943,19 @@
                 }
             };
             
-            // Clear current period data
+            // Clear current period data for the current date
             const clearCurrentPeriod = () => {
                 const hours = state.timePeriodsMap[state.activePeriod];
                 
                 for (const front of state.fronts) {
                     for (const hour of hours) {
-                        state.density[front][hour] = 0;
-                        state.trips[front][hour] = 0;
-                        state.delivery[front][hour] = 0;
+                        state.density[state.currentDate][front][hour] = 0;
+                        state.trips[state.currentDate][front][hour] = 0;
+                        state.delivery[state.currentDate][front][hour] = 0;
                         
                         // Reset potential only for odd hours
                         if (hour % 2 !== 0) {
-                            state.potential[front][hour] = 0;
+                            state.potential[state.currentDate][front][hour] = 0;
                         }
                     }
                 }
@@ -3375,7 +3967,7 @@
                 showToast(`Período ${state.activePeriod} limpo com sucesso`, 'success');
                 
                 // Add to history
-                addToHistory('clear-period', { period: state.activePeriod });
+                addToHistory('clear-period', { date: state.currentDate, period: state.activePeriod });
             };
             
             // Copy previous period data
@@ -3398,12 +3990,15 @@
                     const previousHour = previousHours[i];
                     
                     for (const front of state.fronts) {
-                        state.density[front][currentHour] = state.density[front][previousHour];
-                        state.trips[front][currentHour] = state.trips[front][previousHour];
+                        state.density[state.currentDate][front][currentHour] = 
+                            state.density[state.currentDate][front][previousHour] || 0;
+                        state.trips[state.currentDate][front][currentHour] = 
+                            state.trips[state.currentDate][front][previousHour] || 0;
                         
                         // For odd hours, also copy potential
                         if (currentHour % 2 !== 0) {
-                            state.potential[front][currentHour] = state.potential[front][previousHour];
+                            state.potential[state.currentDate][front][currentHour] = 
+                                state.potential[state.currentDate][front][previousHour] || 0;
                         }
                     }
                 }
@@ -3415,7 +4010,7 @@
                 showToast(`Dados copiados do período ${previousPeriod} para ${state.activePeriod}`, 'success');
                 
                 // Add to history
-                addToHistory('copy-period', { from: previousPeriod, to: state.activePeriod });
+                addToHistory('copy-period', { date: state.currentDate, from: previousPeriod, to: state.activePeriod });
             };
             
             // Show manage fronts modal
@@ -3490,24 +4085,37 @@
                 // Add to fronts array
                 state.fronts.push(frontValue);
                 
-                // Initialize data structures for the new front
-                state.density[frontValue] = {};
-                state.trips[frontValue] = {};
-                state.delivery[frontValue] = {};
-                state.potential[frontValue] = {};
-                
-                for (const hour of state.hours) {
-                    state.density[frontValue][hour] = 0;
-                    state.trips[frontValue][hour] = 0;
-                    state.delivery[frontValue][hour] = 0;
-                    state.potential[frontValue][hour] = 0;
-                }
-                
-                // Initialize period summaries for the new front
-                for (const period in state.timePeriodsMap) {
-                    state.twoHourDelivery[period][frontValue] = 0;
-                    state.twoHourPotential[period][frontValue] = 0;
-                    state.difference[period][frontValue] = 0;
+                // Initialize data structures for the new front for all dates
+                for (const date in state.density) {
+                    // Initialize density, trips, delivery, potential for this date
+                    state.density[date][frontValue] = {};
+                    state.trips[date][frontValue] = {};
+                    state.delivery[date][frontValue] = {};
+                    state.potential[date][frontValue] = {};
+                    
+                    for (const hour of state.hours) {
+                        state.density[date][frontValue][hour] = 0;
+                        state.trips[date][frontValue][hour] = 0;
+                        state.delivery[date][frontValue][hour] = 0;
+                        state.potential[date][frontValue][hour] = 0;
+                    }
+                    
+                    // Initialize period summaries for this date and front
+                    for (const period in state.timePeriodsMap) {
+                        if (!state.twoHourDelivery[date][period]) {
+                            state.twoHourDelivery[date][period] = {};
+                        }
+                        if (!state.twoHourPotential[date][period]) {
+                            state.twoHourPotential[date][period] = {};
+                        }
+                        if (!state.difference[date][period]) {
+                            state.difference[date][period] = {};
+                        }
+                        
+                        state.twoHourDelivery[date][period][frontValue] = 0;
+                        state.twoHourPotential[date][period][frontValue] = 0;
+                        state.difference[date][period][frontValue] = 0;
+                    }
                 }
                 
                 // Clear input
@@ -3543,17 +4151,26 @@
                 // Remove from fronts array
                 state.fronts.splice(index, 1);
                 
-                // Remove data structures
-                delete state.density[front];
-                delete state.trips[front];
-                delete state.delivery[front];
-                delete state.potential[front];
-                
-                // Remove from period summaries
-                for (const period in state.timePeriodsMap) {
-                    delete state.twoHourDelivery[period][front];
-                    delete state.twoHourPotential[period][front];
-                    delete state.difference[period][front];
+                // Remove data structures for all dates
+                for (const date in state.density) {
+                    // Remove density, trips, delivery, potential
+                    if (state.density[date][front]) delete state.density[date][front];
+                    if (state.trips[date][front]) delete state.trips[date][front];
+                    if (state.delivery[date][front]) delete state.delivery[date][front];
+                    if (state.potential[date][front]) delete state.potential[date][front];
+                    
+                    // Remove from period summaries
+                    for (const period in state.timePeriodsMap) {
+                        if (state.twoHourDelivery[date]?.[period]?.[front]) {
+                            delete state.twoHourDelivery[date][period][front];
+                        }
+                        if (state.twoHourPotential[date]?.[period]?.[front]) {
+                            delete state.twoHourPotential[date][period][front];
+                        }
+                        if (state.difference[date]?.[period]?.[front]) {
+                            delete state.difference[date][period][front];
+                        }
+                    }
                 }
                 
                 // Update UI
@@ -3740,6 +4357,12 @@
                         }
                     }
                     
+                    // Highlight dates with data
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    if (state.availableDates.includes(dateStr)) {
+                        dayCell.classList.add('has-data');
+                    }
+                    
                     dayCell.textContent = day;
                     
                     // Add click event to select date range
@@ -3777,6 +4400,399 @@
                 }
             };
             
+            // Update history calendar
+            const updateHistoryCalendar = () => {
+                if (!elements.historyCalendar || !elements.historyMonthYear) return;
+                
+                // Clear previous calendar
+                elements.historyCalendar.innerHTML = '';
+                
+                // Set month and year display
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                elements.historyMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
+                const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
+                
+                // Add empty cells for days before the first day of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'h-12';
+                    elements.historyCalendar.appendChild(emptyCell);
+                }
+                
+                // Add days
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+                    currentDate.setHours(0, 0, 0, 0);
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    
+                    dayCell.className = 'h-12 flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200';
+                    
+                    // Add date number
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'text-sm font-medium';
+                    dateSpan.textContent = day;
+                    dayCell.appendChild(dateSpan);
+                    
+                    // Highlight current date
+                    if (dateStr === state.currentDate) {
+                        dayCell.classList.add('bg-primary/10', 'dark:bg-primary/20');
+                        dateSpan.classList.add('text-primary', 'font-bold');
+                    }
+                    
+                    // Highlight today
+                    if (currentDate.getTime() === today.getTime()) {
+                        dayCell.classList.add('border-2', 'border-primary');
+                    }
+                    
+                    // Mark dates with data
+                    if (state.availableDates.includes(dateStr)) {
+                        const dataIndicator = document.createElement('div');
+                        dataIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mt-1';
+                        dayCell.appendChild(dataIndicator);
+                    }
+                    
+                    // Set date attribute for easier access
+                    dayCell.setAttribute('data-date', dateStr);
+                    
+                    // Add click event to select date
+                    dayCell.addEventListener('click', function() {
+                        const selectedDate = this.getAttribute('data-date');
+                        if (selectedDate) {
+                            changeCurrentDate(selectedDate);
+                            updateHistoryCalendar();
+                            updateHistoryTable();
+                        }
+                    });
+                    
+                    elements.historyCalendar.appendChild(dayCell);
+                }
+            };
+            
+            // Navigate history month
+            const navigateHistoryMonth = (direction) => {
+                state.calendar.currentMonth += direction;
+                if (state.calendar.currentMonth > 11) {
+                    state.calendar.currentMonth = 0;
+                    state.calendar.currentYear++;
+                } else if (state.calendar.currentMonth < 0) {
+                    state.calendar.currentMonth = 11;
+                    state.calendar.currentYear--;
+                }
+                
+                updateHistoryCalendar();
+            };
+            
+            // Update history table
+            const updateHistoryTable = () => {
+                if (!elements.historyTableBody || !elements.historyEmptyState) return;
+                
+                // Get selected period filter
+                const periodFilter = document.getElementById('history-period-filter')?.value || 'all';
+                
+                // Clear previous table data
+                elements.historyTableBody.innerHTML = '';
+                
+                // Get available dates (sorted from newest to oldest)
+                const dates = [...state.availableDates].sort((a, b) => {
+                    return new Date(b) - new Date(a);
+                });
+                
+                if (dates.length === 0) {
+                    // Show empty state
+                    elements.historyEmptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                elements.historyEmptyState.classList.add('hidden');
+                
+                // Add row for each date
+                dates.forEach(date => {
+                    const row = document.createElement('tr');
+                    
+                    // Calculate totals for this date
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    let totalTrips = 0;
+                    let densitySum = 0;
+                    let densityCount = 0;
+                    
+                    // If a specific period is selected, only include that period's data
+                    if (periodFilter !== 'all') {
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[periodFilter]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[periodFilter]?.[front] || 0;
+                        }
+                        
+                        // Get hours for the selected period
+                        const hours = state.timePeriodsMap[periodFilter];
+                        
+                        // Calculate trips and density for these hours
+                        for (const front of state.fronts) {
+                            for (const hour of hours) {
+                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                                
+                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                    densitySum += state.density[date][front][hour];
+                                    densityCount++;
+                                }
+                            }
+                        }
+                    } else {
+                        // Include all periods' data
+                        for (const period in state.timePeriodsMap) {
+                            for (const front of state.fronts) {
+                                totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                                totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                            }
+                        }
+                        
+                        // Calculate trips and density for all hours
+                        for (const front of state.fronts) {
+                            for (const hour of state.hours) {
+                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                                
+                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                    densitySum += state.density[date][front][hour];
+                                    densityCount++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Calculate efficiency and average density
+                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                    
+                    // Format date for display
+                    const formattedDate = formatDateDisplay(date);
+                    
+                    // Highlight current date
+                    const isCurrentDate = date === state.currentDate;
+                    
+                    row.className = `hover:bg-gray-100 dark:hover:bg-gray-700 ${isCurrentDate ? 'bg-primary/10 dark:bg-primary/20' : ''}`;
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap font-medium ${isCurrentDate ? 'text-primary' : ''}">
+                            ${formattedDate}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">
+                            ${totalDelivery.toFixed(2)} ton
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${totalPotential.toFixed(2)} ton
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium ${getEfficiencyTextColor(efficiency)}">
+                            ${efficiency.toFixed(1)}%
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${totalTrips}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${avgDensity.toFixed(2)}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex space-x-2">
+                                <button class="view-date-btn text-primary hover:text-primary-600 dark:hover:text-primary-400 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Ver Data">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                                <button class="export-date-btn text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Exportar Data">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    elements.historyTableBody.appendChild(row);
+                });
+                
+                // Add event listeners for view and export buttons
+                document.querySelectorAll('.view-date-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        if (date) {
+                            changeCurrentDate(date);
+                            showPage('entrega-hora');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.export-date-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        if (date) {
+                            exportDateData(date);
+                        }
+                    });
+                });
+            };
+            
+            // Export data for a specific date
+            const exportDateData = (date) => {
+                const formattedDate = formatDateDisplay(date);
+                
+                // Create PDF with date data
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(`Relatório de Entregas - ${formattedDate}`, 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Define table headers
+                const headers = [['Período', 'Frente', 'Entrega', 'Potencial', 'Eficiência', 'Viagens', 'Densidade']];
+                
+                // Prepare table data
+                const data = [];
+                
+                for (const period in state.timePeriodsMap) {
+                    for (const front of state.fronts) {
+                        const twoHourDelivery = state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                        const twoHourPotential = state.twoHourPotential[date]?.[period]?.[front] || 0;
+                        const efficiency = twoHourPotential > 0 ? (twoHourDelivery / twoHourPotential) * 100 : 0;
+                        
+                        // Calculate trips and density for this period
+                        const hours = state.timePeriodsMap[period];
+                        let trips = 0;
+                        let densitySum = 0;
+                        let densityCount = 0;
+                        
+                        for (const hour of hours) {
+                            trips += state.trips[date]?.[front]?.[hour] || 0;
+                            
+                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[date][front][hour];
+                                densityCount++;
+                            }
+                        }
+                        
+                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                        
+                        data.push([
+                            `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`,
+                            `F${front}`,
+                            twoHourDelivery.toFixed(2),
+                            twoHourPotential.toFixed(2),
+                            `${efficiency.toFixed(1)}%`,
+                            trips.toString(),
+                            avgDensity.toFixed(2)
+                        ]);
+                    }
+                }
+                
+                // Add table
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
+                });
+                
+                // Save the PDF
+                doc.save(`safra-2025-relatorio-${date}.pdf`);
+                
+                showToast(`Relatório de ${formattedDate} exportado com sucesso!`, 'success');
+            };
+            
+            // Export history data
+            const exportHistoryData = () => {
+                // Create PDF with history data
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Histórico de Entregas - Safra 2025', 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Define table headers
+                const headers = [['Data', 'Total Entregue', 'Total Potencial', 'Eficiência', 'Viagens', 'Densidade Média']];
+                
+                // Get available dates (sorted from newest to oldest)
+                const dates = [...state.availableDates].sort((a, b) => {
+                    return new Date(b) - new Date(a);
+                });
+                
+                // Prepare table data
+                const data = dates.map(date => {
+                    // Calculate totals for this date
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    let totalTrips = 0;
+                    let densitySum = 0;
+                    let densityCount = 0;
+                    
+                    // Include all periods' data
+                    for (const period in state.timePeriodsMap) {
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                        }
+                    }
+                    
+                    // Calculate trips and density for all hours
+                    for (const front of state.fronts) {
+                        for (const hour of state.hours) {
+                            totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                            
+                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[date][front][hour];
+                                densityCount++;
+                            }
+                        }
+                    }
+                    
+                    // Calculate efficiency and average density
+                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                    
+                    // Format date for display
+                    const formattedDate = formatDateDisplay(date);
+                    
+                    return [
+                        formattedDate,
+                        totalDelivery.toFixed(2),
+                        totalPotential.toFixed(2),
+                        `${efficiency.toFixed(1)}%`,
+                        totalTrips.toString(),
+                        avgDensity.toFixed(2)
+                    ];
+                });
+                
+                // Add table
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
+                });
+                
+                // Save the PDF
+                doc.save(`safra-2025-historico.pdf`);
+                
+                showToast('Histórico exportado com sucesso!', 'success');
+            };
+            
             // Format date to dd/mm/yyyy
             const formatDate = (date) => {
                 if (!date) return '';
@@ -3805,7 +4821,16 @@
                     `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`.includes(searchTerm)
                 );
                 
+                // Search in dates
+                const dateResults = state.availableDates.filter(date => {
+                    const formattedDate = formatDateDisplay(date);
+                    return formattedDate.toLowerCase().includes(searchTerm);
+                });
+                
                 // Add results to the UI
+                let resultsCount = 0;
+                
+                // Add front results
                 if (frontResults.length > 0) {
                     frontResults.forEach(front => {
                         const resultItem = document.createElement('a');
@@ -3820,7 +4845,7 @@
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Frente ${front}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora > Período 06:00-08:00</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora > Período ${state.activePeriod}</p>
                                 </div>
                             </div>
                         `;
@@ -3838,9 +4863,11 @@
                         });
                         
                         searchResults.appendChild(resultItem);
+                        resultsCount++;
                     });
                 }
                 
+                // Add period results
                 if (periodResults.length > 0) {
                     periodResults.forEach(period => {
                         const resultItem = document.createElement('a');
@@ -3868,11 +4895,46 @@
                         });
                         
                         searchResults.appendChild(resultItem);
+                        resultsCount++;
+                    });
+                }
+                
+                // Add date results
+                if (dateResults.length > 0) {
+                    dateResults.forEach(date => {
+                        const formattedDate = formatDateDisplay(date);
+                        
+                        const resultItem = document.createElement('a');
+                        resultItem.href = '#';
+                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
+                        resultItem.innerHTML = `
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-500 dark:text-purple-300">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${formattedDate}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Histórico Diário</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        resultItem.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            changeCurrentDate(date);
+                            showPage('entrega-hora');
+                            toggleModal(elements.searchModal, false);
+                        });
+                        
+                        searchResults.appendChild(resultItem);
+                        resultsCount++;
                     });
                 }
                 
                 // If no results found
-                if (frontResults.length === 0 && periodResults.length === 0) {
+                if (resultsCount === 0) {
                     const noResults = document.createElement('div');
                     noResults.className = 'text-center py-4 text-gray-500 dark:text-gray-400';
                     noResults.textContent = 'Nenhum resultado encontrado';
@@ -4000,10 +5062,15 @@
                 try {
                     const data = {
                         fronts: state.fronts,
+                        availableDates: state.availableDates,
                         density: state.density,
                         trips: state.trips,
                         delivery: state.delivery,
                         potential: state.potential,
+                        twoHourDelivery: state.twoHourDelivery,
+                        twoHourPotential: state.twoHourPotential,
+                        difference: state.difference,
+                        currentDate: state.currentDate,
                         lastSaved: new Date().toISOString()
                     };
                     
@@ -4024,17 +5091,28 @@
                         const data = JSON.parse(savedData);
                         
                         // Update state with saved data
-                        state.fronts = data.fronts;
-                        state.density = data.density;
-                        state.trips = data.trips;
-                        state.delivery = data.delivery;
-                        state.potential = data.potential;
+                        state.fronts = data.fronts || state.fronts;
+                        state.availableDates = data.availableDates || [];
+                        state.density = data.density || {};
+                        state.trips = data.trips || {};
+                        state.delivery = data.delivery || {};
+                        state.potential = data.potential || {};
+                        state.twoHourDelivery = data.twoHourDelivery || {};
+                        state.twoHourPotential = data.twoHourPotential || {};
+                        state.difference = data.difference || {};
                         
-                        // Recalculate derived data
-                        calculateDelivery();
-                        calculateTwoHourTotals();
+                        // Set current date from saved data or use today
+                        if (data.currentDate) {
+                            state.currentDate = data.currentDate;
+                        }
+                        
+                        // Make sure current date is properly initialized
+                        initializeDataStructures();
                         
                         // Update UI with loaded data
+                        updateDateDisplay();
+                        updateDateNavigationButtons();
+                        
                         if (state.currentPage === 'entrega-hora') {
                             generateTimePeriodHTML();
                         }
@@ -4053,16 +5131,33 @@
             
             // Load initial test data
             const loadInitialData = () => {
+                // Add the current date to available dates
+                if (!state.availableDates.includes(state.currentDate)) {
+                    state.availableDates.push(state.currentDate);
+                }
+                
                 // Example data for testing
                 for (const front of state.fronts) {
+                    if (!state.density[state.currentDate][front]) {
+                        state.density[state.currentDate][front] = {};
+                    }
+                    if (!state.trips[state.currentDate][front]) {
+                        state.trips[state.currentDate][front] = {};
+                    }
+                    if (!state.potential[state.currentDate][front]) {
+                        state.potential[state.currentDate][front] = {};
+                    }
+                    
                     for (const hour of state.hours) {
                         // Generate random data for demonstration
-                        state.density[front][hour] = Math.random() * 20 + 60; // Random density between 60-80
-                        state.trips[front][hour] = Math.floor(Math.random() * 10); // Random trips between 0-9
+                        state.density[state.currentDate][front][hour] = Math.random() * 20 + 60; // Random density between 60-80
+                        state.trips[state.currentDate][front][hour] = Math.floor(Math.random() * 10); // Random trips between 0-9
                         
                         // Only odd hours have potential
                         if (hour % 2 !== 0) {
-                            state.potential[front][hour] = Math.floor(Math.random() * 50) + 50; // Random potential between 50-100
+                            state.potential[state.currentDate][front][hour] = Math.floor(Math.random() * 50) + 50; // Random potential between 50-100
+                        } else {
+                            state.potential[state.currentDate][front][hour] = 0;
                         }
                     }
                 }
@@ -4075,12 +5170,16 @@
             // Export as JSON file
             const exportJSON = () => {
                 const data = {
+                    date: state.currentDate,
                     fronts: state.fronts,
-                    density: state.density,
-                    trips: state.trips,
-                    delivery: state.delivery,
-                    potential: state.potential,
-                    date: new Date().toISOString()
+                    density: state.density[state.currentDate],
+                    trips: state.trips[state.currentDate],
+                    delivery: state.delivery[state.currentDate],
+                    potential: state.potential[state.currentDate],
+                    twoHourDelivery: state.twoHourDelivery[state.currentDate],
+                    twoHourPotential: state.twoHourPotential[state.currentDate],
+                    difference: state.difference[state.currentDate],
+                    exportDate: new Date().toISOString()
                 };
                 
                 const json = JSON.stringify(data, null, 2);
@@ -4089,7 +5188,7 @@
                 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `safra-2025-data-${formatDate(new Date())}.json`;
+                a.download = `safra-2025-data-${state.currentDate}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -4102,18 +5201,19 @@
                 let csvContent = 'data:text/csv;charset=utf-8,';
                 
                 // Headers
-                csvContent += 'Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
+                csvContent += 'Data,Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
                 
                 // Data
                 for (const front of state.fronts) {
                     for (const hour of state.hours) {
                         const row = [
+                            state.currentDate,
                             front,
                             hour,
-                            state.density[front][hour],
-                            state.trips[front][hour],
-                            state.delivery[front][hour],
-                            state.potential[front][hour]
+                            state.density[state.currentDate]?.[front]?.[hour] || 0,
+                            state.trips[state.currentDate]?.[front]?.[hour] || 0,
+                            state.delivery[state.currentDate]?.[front]?.[hour] || 0,
+                            state.potential[state.currentDate]?.[front]?.[hour] || 0
                         ];
                         
                         csvContent += row.join(',') + '\n';
@@ -4123,7 +5223,7 @@
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement('a');
                 link.setAttribute('href', encodedUri);
-                link.setAttribute('download', `safra-2025-data-${formatDate(new Date())}.csv`);
+                link.setAttribute('download', `safra-2025-data-${state.currentDate}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -4143,28 +5243,57 @@
                 
                 // Add title
                 doc.setFontSize(18);
-                doc.text('Relatório de Entrega de Safra 2025', 14, 20);
+                doc.text(`Relatório de Entrega de Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
                 
                 // Add date
                 doc.setFontSize(10);
-                doc.text(`Data: ${formatDate(new Date())}`, 14, 30);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
                 
                 // Define table headers
-                const headers = [['Frente', 'Hora', 'Densidade', 'Viagens', 'Entrega', 'Potencial']];
+                const headers = [['Período', 'Frente', 'Densidade', 'Viagens', 'Entrega', 'Potencial', 'Eficiência']];
                 
                 // Prepare table data
                 const data = [];
                 
-                for (const front of state.fronts) {
-                    for (const hour of state.hours) {
+                for (const period in state.timePeriodsMap) {
+                    const hours = state.timePeriodsMap[period];
+                    const periodLabel = `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`;
+                    
+                    for (const front of state.fronts) {
+                        // Calculate density and trips for this period
+                        let densitySum = 0;
+                        let densityCount = 0;
+                        let trips = 0;
+                        
+                        for (const hour of hours) {
+                            if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[state.currentDate][front][hour];
+                                densityCount++;
+                            }
+                            trips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        }
+                        
+                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                        
+                        // Get delivery and potential for this period
+                        const delivery = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        const potential = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        const efficiency = potential > 0 ? (delivery / potential) * 100 : 0;
+                        
                         data.push([
-                            front,
-                            hour,
-                            state.density[front][hour].toFixed(2),
-                            state.trips[front][hour],
-                            state.delivery[front][hour].toFixed(2),
-                            state.potential[front][hour]
+                            periodLabel,
+                            `F${front}`,
+                            avgDensity.toFixed(2),
+                            trips.toString(),
+                            delivery.toFixed(2),
+                            potential.toFixed(2),
+                            `${efficiency.toFixed(1)}%`
                         ]);
+                    }
+                    
+                    // Add a blank row between periods for better readability
+                    if (Object.keys(state.timePeriodsMap).indexOf(period) < Object.keys(state.timePeriodsMap).length - 1) {
+                        data.push(['', '', '', '', '', '', '']);
                     }
                 }
                 
@@ -4179,7 +5308,7 @@
                 });
                 
                 // Save the PDF
-                doc.save(`safra-2025-report-${formatDate(new Date())}.pdf`);
+                doc.save(`safra-2025-report-${state.currentDate}.pdf`);
                 
                 showToast('Dados exportados com sucesso!', 'success');
             };
@@ -4196,48 +5325,58 @@
                 
                 // Add title
                 doc.setFontSize(18);
-                doc.text('Dashboard de Desempenho - Safra 2025', 14, 20);
+                doc.text(`Dashboard de Desempenho - Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
                 
                 // Add date
                 doc.setFontSize(10);
-                doc.text(`Exportado em: ${formatDate(new Date())}`, 14, 30);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
                 
                 // Add summary table
                 const summaryHeaders = [['Métrica', 'Valor']];
                 
-                // Calculate summary data
-                const totalDelivery = Object.keys(state.delivery).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.delivery[front]).reduce((hourSum, hour) => {
-                        return hourSum + state.delivery[front][hour];
+                // Calculate summary data for current date
+                const totalDelivery = Object.keys(state.twoHourDelivery[state.currentDate] || {}).reduce((periodSum, period) => {
+                    return periodSum + Object.keys(state.twoHourDelivery[state.currentDate][period] || {}).reduce((frontSum, front) => {
+                        return frontSum + (state.twoHourDelivery[state.currentDate][period][front] || 0);
                     }, 0);
                 }, 0);
                 
-                const totalPotential = Object.keys(state.potential).reduce((frontSum, front) => {
-                    let frontPotential = 0;
-                    for (const period in state.timePeriodsMap) {
-                        const hours = state.timePeriodsMap[period];
-                        const oddHour = hours.find(h => h % 2 !== 0);
-                        if (oddHour && state.potential[front][oddHour]) {
-                            frontPotential += state.potential[front][oddHour] * 2;
-                        }
-                    }
-                    return frontSum + frontPotential;
+                const totalPotential = Object.keys(state.twoHourPotential[state.currentDate] || {}).reduce((periodSum, period) => {
+                    return periodSum + Object.keys(state.twoHourPotential[state.currentDate][period] || {}).reduce((frontSum, front) => {
+                        return frontSum + (state.twoHourPotential[state.currentDate][period][front] || 0);
+                    }, 0);
                 }, 0);
                 
                 const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
                 
-                const totalTrips = Object.keys(state.trips).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.trips[front]).reduce((hourSum, hour) => {
-                        return hourSum + state.trips[front][hour];
+                const totalTrips = Object.keys(state.trips[state.currentDate] || {}).reduce((frontSum, front) => {
+                    return frontSum + Object.keys(state.trips[state.currentDate][front] || {}).reduce((hourSum, hour) => {
+                        return hourSum + (state.trips[state.currentDate][front][hour] || 0);
                     }, 0);
                 }, 0);
+                
+                // Calculate average density
+                let densitySum = 0;
+                let densityCount = 0;
+                
+                for (const front in state.density[state.currentDate] || {}) {
+                    for (const hour in state.density[state.currentDate][front] || {}) {
+                        if ((state.density[state.currentDate][front][hour] || 0) > 0) {
+                            densitySum += state.density[state.currentDate][front][hour];
+                            densityCount++;
+                        }
+                    }
+                }
+                
+                const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
                 
                 // Create summary data array
                 const summaryData = [
                     ['Total Entregue', `${totalDelivery.toFixed(2)} ton`],
                     ['Total Potencial', `${totalPotential.toFixed(2)} ton`],
                     ['Eficiência', `${efficiency.toFixed(1)}%`],
-                    ['Total de Viagens', totalTrips.toString()]
+                    ['Total de Viagens', totalTrips.toString()],
+                    ['Densidade Média', avgDensity.toFixed(2)]
                 ];
                 
                 // Add summary table
@@ -4251,30 +5390,35 @@
                 });
                 
                 // Add detailed data by front
-                const frontHeaders = [['Frente', 'Total Entregue', 'Total Previsto', 'Eficiência', 'Viagens']];
+                const frontHeaders = [['Frente', 'Total Entregue', 'Total Previsto', 'Eficiência', 'Viagens', 'Densidade Média']];
                 const frontData = [];
                 
                 for (const front of state.fronts) {
+                    // Calculate front total delivery
                     let frontDelivery = 0;
                     let frontPotential = 0;
                     let frontTrips = 0;
+                    let frontDensitySum = 0;
+                    let frontDensityCount = 0;
                     
                     // Calculate totals across all periods
                     for (const period in state.timePeriodsMap) {
-                        const hours = state.timePeriodsMap[period];
+                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    // Calculate trips and density
+                    for (const hour of state.hours) {
+                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
                         
-                        // Sum delivery and trips for this period
-                        for (const hour of hours) {
-                            frontDelivery += state.delivery[front][hour] || 0;
-                            frontTrips += state.trips[front][hour] || 0;
-                        }
-                        
-                        // Sum potential for this period (only odd hours have potential)
-                        const oddHour = hours.find(h => h % 2 !== 0);
-                        if (oddHour && state.potential[front][oddHour]) {
-                            frontPotential += state.potential[front][oddHour] * 2;
+                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                            frontDensitySum += state.density[state.currentDate][front][hour];
+                            frontDensityCount++;
                         }
                     }
+                    
+                    // Calculate average density
+                    const frontAvgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
                     
                     // Calculate efficiency
                     const frontEfficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
@@ -4284,7 +5428,8 @@
                         `${frontDelivery.toFixed(2)} ton`,
                         `${frontPotential.toFixed(2)} ton`,
                         `${frontEfficiency.toFixed(1)}%`,
-                        frontTrips.toString()
+                        frontTrips.toString(),
+                        frontAvgDensity.toFixed(2)
                     ]);
                 }
                 
@@ -4298,7 +5443,7 @@
                 });
                 
                 // Save the PDF
-                doc.save(`safra-2025-dashboard-${formatDate(new Date())}.pdf`);
+                doc.save(`safra-2025-dashboard-${state.currentDate}.pdf`);
                 
                 showToast('Dashboard exportado com sucesso!', 'success');
             };
@@ -4339,21 +5484,11 @@
                 // Update date display
                 updateDateDisplay();
                 
+                // Update date navigation buttons
+                updateDateNavigationButtons();
+                
                 // Setup periodic updates
                 setInterval(updateDateDisplay, 60000); // Update every minute
-            };
-            
-            // Update date display
-            const updateDateDisplay = () => {
-                const headerDate = document.getElementById('header-date');
-                
-                if (headerDate) {
-                    const now = new Date();
-                    const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-                    
-                    const formattedDate = now.toLocaleDateString('pt-BR', dateOptions);
-                    headerDate.textContent = formattedDate;
-                }
             };
             
             return {
