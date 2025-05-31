@@ -1008,7 +1008,6 @@
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Frente</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Entregue</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Previsto</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Não Entregue</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Eficiência</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Viagens</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Densidade Média</th>
@@ -1023,7 +1022,6 @@
                                             <td class="px-4 py-3 whitespace-nowrap">TOTAL</td>
                                             <td id="total-entregue" class="px-4 py-3 whitespace-nowrap">0.00</td>
                                             <td id="total-potencial" class="px-4 py-3 whitespace-nowrap">0.00</td>
-                                            <td id="total-nao-entregue" class="px-4 py-3 whitespace-nowrap text-danger-600 dark:text-danger-400">0.00</td>
                                             <td id="total-eficiencia" class="px-4 py-3 whitespace-nowrap">0%</td>
                                             <td id="total-viagens" class="px-4 py-3 whitespace-nowrap">0</td>
                                             <td id="total-densidade" class="px-4 py-3 whitespace-nowrap">0.00</td>
@@ -3769,7 +3767,7 @@
                 }
             };
             
-            // Update the detailed front table with real data including non-delivered amount
+            // Update the detailed front table with real data
             const updateDetailedFrontTable = () => {
                 if (!elements.frontDetailsTable) return;
                 
@@ -3782,7 +3780,6 @@
                 let totalViagens = 0;
                 let totalDensidadeSum = 0;
                 let totalDensidadeCount = 0;
-                let totalNaoEntregue = 0;
                 
                 // Add rows for each front
                 state.fronts.forEach(front => {
@@ -3818,9 +3815,6 @@
                     // Calculate average density
                     const avgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
                     
-                    // Calculate non-delivered amount (negative value showing what was not delivered)
-                    const naoEntregue = frontPotential - frontDelivery;
-                    
                     // Create row
                     const row = document.createElement('tr');
                     row.className = 'front-detail-row';
@@ -3832,7 +3826,6 @@
                         <td class="px-4 py-3 whitespace-nowrap font-semibold">F${front}</td>
                         <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">${frontDelivery.toFixed(2)} ton</td>
                         <td class="px-4 py-3 whitespace-nowrap">${frontPotential.toFixed(2)} ton</td>
-                        <td class="px-4 py-3 whitespace-nowrap font-medium ${naoEntregue > 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400'}">${naoEntregue > 0 ? '-' + naoEntregue.toFixed(2) : '0.00'} ton</td>
                         <td class="px-4 py-3 whitespace-nowrap font-medium ${efficiencyColor}">${efficiency.toFixed(1)}%</td>
                         <td class="px-4 py-3 whitespace-nowrap">${frontTrips}</td>
                         <td class="px-4 py-3 whitespace-nowrap">${avgDensity.toFixed(2)}</td>
@@ -3852,65 +3845,51 @@
                     totalViagens += frontTrips;
                     totalDensidadeSum += frontDensitySum;
                     totalDensidadeCount += frontDensityCount;
-                    totalNaoEntregue += naoEntregue;
                 });
                 
-                // Update totals in footer
-                const totalEficiencia = totalPotencial > 0 ? (totalEntregue / totalPotencial) * 100 : 0;
-                const totalDensidadeAvg = totalDensidadeCount > 0 ? totalDensidadeSum / totalDensidadeCount : 0;
+                // Update footer totals
+                const totalEfficiency = totalPotencial > 0 ? (totalEntregue / totalPotencial) * 100 : 0;
+                const totalAvgDensity = totalDensidadeCount > 0 ? totalDensidadeSum / totalDensidadeCount : 0;
                 
-                // Update total elements
-                const totalEntregueElement = document.getElementById('total-entregue');
-                const totalPotencialElement = document.getElementById('total-potencial');
-                const totalNaoEntregueElement = document.getElementById('total-nao-entregue');
-                const totalEficienciaElement = document.getElementById('total-eficiencia');
-                const totalViagensElement = document.getElementById('total-viagens');
-                const totalDensidadeElement = document.getElementById('total-densidade');
+                document.getElementById('total-entregue').textContent = `${totalEntregue.toFixed(2)} ton`;
+                document.getElementById('total-potencial').textContent = `${totalPotencial.toFixed(2)} ton`;
+                document.getElementById('total-eficiencia').textContent = `${totalEfficiency.toFixed(1)}%`;
+                document.getElementById('total-viagens').textContent = totalViagens;
+                document.getElementById('total-densidade').textContent = totalAvgDensity.toFixed(2);
+                
                 const totalProgressBar = document.getElementById('total-progress-bar');
                 const totalProgressText = document.getElementById('total-progress-text');
                 
-                if (totalEntregueElement) totalEntregueElement.textContent = totalEntregue.toFixed(2);
-                if (totalPotencialElement) totalPotencialElement.textContent = totalPotencial.toFixed(2);
-                if (totalNaoEntregueElement) {
-                    totalNaoEntregueElement.textContent = totalNaoEntregue > 0 ? `-${totalNaoEntregue.toFixed(2)}` : '0.00';
-                    totalNaoEntregueElement.className = totalNaoEntregue > 0 ? 
-                        'px-4 py-3 whitespace-nowrap text-danger-600 dark:text-danger-400' : 
-                        'px-4 py-3 whitespace-nowrap text-success-600 dark:text-success-400';
-                }
-                if (totalEficienciaElement) totalEficienciaElement.textContent = totalEficiencia.toFixed(1) + '%';
-                if (totalViagensElement) totalViagensElement.textContent = totalViagens.toString();
-                if (totalDensidadeElement) totalDensidadeElement.textContent = totalDensidadeAvg.toFixed(2);
-                
                 if (totalProgressBar && totalProgressText) {
-                    totalProgressBar.style.width = `${Math.min(100, totalEficiencia)}%`;
-                    totalProgressBar.className = `bg-primary h-2.5 rounded-full ${getProgressBarColor(totalEficiencia)}`;
-                    totalProgressText.textContent = totalEficiencia.toFixed(1) + '%';
+                    totalProgressBar.style.width = `${Math.min(100, totalEfficiency)}%`;
+                    totalProgressBar.className = `${getProgressBarColor(totalEfficiency)} h-2.5 rounded-full`;
+                    totalProgressText.textContent = `${totalEfficiency.toFixed(1)}%`;
                 }
             };
             
-            // Get efficiency text color based on percentage
-            const getEfficiencyTextColor = (percentage) => {
-                if (percentage >= 90) {
-                    return 'text-success-600 dark:text-success-400';
-                } else if (percentage >= 75) {
-                    return 'text-primary dark:text-primary-300';
-                } else if (percentage >= 50) {
-                    return 'text-warning-600 dark:text-warning-400';
+            // Helper function to get text color class based on efficiency percentage
+            const getEfficiencyTextColor = (value) => {
+                if (value >= 90) {
+                    return "text-success-600 dark:text-success-400";  // Green
+                } else if (value >= 75) {
+                    return "text-primary-600 dark:text-primary-400";  // Primary
+                } else if (value >= 50) {
+                    return "text-warning-600 dark:text-warning-400";  // Yellow
                 } else {
-                    return 'text-danger-600 dark:text-danger-400';
+                    return "text-danger-600 dark:text-danger-400";    // Red
                 }
             };
             
-            // Get progress bar color based on percentage
-            const getProgressBarColor = (percentage) => {
-                if (percentage >= 90) {
-                    return 'bg-success-500';
-                } else if (percentage >= 75) {
-                    return 'bg-primary';
-                } else if (percentage >= 50) {
-                    return 'bg-warning-500';
+            // Helper function to get progress bar color class based on efficiency percentage
+            const getProgressBarColor = (value) => {
+                if (value >= 90) {
+                    return "bg-success-500 dark:bg-success-600";  // Green
+                } else if (value >= 75) {
+                    return "bg-primary dark:bg-primary-600";      // Primary
+                } else if (value >= 50) {
+                    return "bg-warning-500 dark:bg-warning-600";  // Yellow
                 } else {
-                    return 'bg-danger-500';
+                    return "bg-danger-500 dark:bg-danger-600";    // Red
                 }
             };
             
@@ -3918,66 +3897,53 @@
             const switchTimePeriodTab = (period) => {
                 state.activePeriod = period;
                 
-                // Update tab states
+                // Update time tab buttons
                 elements.timeTabButtons.forEach(button => {
+                    button.classList.remove('bg-primary', 'text-white');
+                    button.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+                    
                     if (button.getAttribute('data-period') === period) {
                         button.classList.add('bg-primary', 'text-white');
                         button.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
-                    } else {
-                        button.classList.remove('bg-primary', 'text-white');
-                        button.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
                     }
                 });
                 
-                // Show/hide period content
+                // Hide all period contents
                 document.querySelectorAll('.period-content').forEach(content => {
-                    if (content.id === `period-${period}`) {
-                        content.classList.remove('hidden');
-                    } else {
-                        content.classList.add('hidden');
-                    }
+                    content.classList.add('hidden');
                 });
+                
+                // Show selected period content
+                const periodContent = document.getElementById(`period-${period}`);
+                if (periodContent) {
+                    periodContent.classList.remove('hidden');
+                }
             };
             
-            // Show/hide loading indicator
+            // Show loading indicator
             const showLoading = (show) => {
-                if (elements.loadingIndicator) {
+                if (elements.loadingIndicator && elements.timePeriodContent) {
                     if (show) {
                         elements.loadingIndicator.classList.remove('hidden');
+                        elements.timePeriodContent.classList.add('hidden');
                     } else {
                         elements.loadingIndicator.classList.add('hidden');
+                        elements.timePeriodContent.classList.remove('hidden');
                     }
                 }
             };
             
-            // Confirmation modal functions
-            let confirmationCallback = null;
-            
-            const showConfirmationModal = (title, message, callback) => {
-                const modalTitle = document.getElementById('modal-title');
-                const modalMessage = document.getElementById('modal-message');
-                const modalConfirm = document.getElementById('modal-confirm');
+            // Add to history for undo/redo
+            const addToHistory = (action, data) => {
+                state.history.push({ action, data, timestamp: new Date() });
                 
-                if (modalTitle) modalTitle.textContent = title;
-                if (modalMessage) modalMessage.textContent = message;
-                
-                confirmationCallback = callback;
-                
-                // Add confirmation callback
-                if (modalConfirm) {
-                    modalConfirm.onclick = () => {
-                        if (confirmationCallback) {
-                            confirmationCallback();
-                            confirmationCallback = null;
-                        }
-                        toggleModal(elements.confirmationModal, false);
-                    };
+                // Limit history size to prevent memory issues
+                if (state.history.length > 100) {
+                    state.history.shift();
                 }
-                
-                toggleModal(elements.confirmationModal, true);
             };
             
-            // Clear current period
+            // Clear current period data for the current date
             const clearCurrentPeriod = () => {
                 const hours = state.timePeriodsMap[state.activePeriod];
                 
@@ -3986,7 +3952,9 @@
                         state.density[state.currentDate][front][hour] = 0;
                         state.trips[state.currentDate][front][hour] = 0;
                         state.delivery[state.currentDate][front][hour] = 0;
-                        if (hour % 2 !== 0) { // Only odd hours have potential
+                        
+                        // Reset potential only for odd hours
+                        if (hour % 2 !== 0) {
                             state.potential[state.currentDate][front][hour] = 0;
                         }
                     }
@@ -3994,560 +3962,367 @@
                 
                 calculateDelivery();
                 calculateTwoHourTotals();
+                generateTimePeriodHTML();
                 updateUI();
+                showToast(`Período ${state.activePeriod} limpo com sucesso`, 'success');
                 
-                showToast(`Período ${state.activePeriod} limpo com sucesso!`, 'success');
+                // Add to history
+                addToHistory('clear-period', { date: state.currentDate, period: state.activePeriod });
             };
             
-            // Copy previous period
+            // Copy previous period data
             const copyPreviousPeriod = () => {
-                // Get the previous date
-                const currentDate = new Date(state.currentDate);
-                currentDate.setDate(currentDate.getDate() - 1);
-                const prevDate = currentDate.toISOString().split('T')[0];
+                const periods = Object.keys(state.timePeriodsMap);
+                const currentIndex = periods.indexOf(state.activePeriod);
                 
-                // Check if previous date has data
-                if (!state.density[prevDate] || !state.trips[prevDate] || !state.potential[prevDate]) {
-                    showToast('Não há dados do dia anterior para copiar.', 'warning');
+                if (currentIndex <= 0) {
+                    showToast('Não há período anterior para copiar', 'error');
                     return;
                 }
                 
-                const hours = state.timePeriodsMap[state.activePeriod];
+                const previousPeriod = periods[currentIndex - 1];
+                const previousHours = state.timePeriodsMap[previousPeriod];
+                const currentHours = state.timePeriodsMap[state.activePeriod];
                 
-                for (const front of state.fronts) {
-                    for (const hour of hours) {
-                        // Copy data from previous date
-                        state.density[state.currentDate][front][hour] = state.density[prevDate]?.[front]?.[hour] || 0;
-                        state.trips[state.currentDate][front][hour] = state.trips[prevDate]?.[front]?.[hour] || 0;
-                        if (hour % 2 !== 0) { // Only odd hours have potential
-                            state.potential[state.currentDate][front][hour] = state.potential[prevDate]?.[front]?.[hour] || 0;
+                // Copy data from previous period
+                for (let i = 0; i < currentHours.length; i++) {
+                    const currentHour = currentHours[i];
+                    const previousHour = previousHours[i];
+                    
+                    for (const front of state.fronts) {
+                        state.density[state.currentDate][front][currentHour] = 
+                            state.density[state.currentDate][front][previousHour] || 0;
+                        state.trips[state.currentDate][front][currentHour] = 
+                            state.trips[state.currentDate][front][previousHour] || 0;
+                        
+                        // For odd hours, also copy potential
+                        if (currentHour % 2 !== 0) {
+                            state.potential[state.currentDate][front][currentHour] = 
+                                state.potential[state.currentDate][front][previousHour] || 0;
                         }
                     }
                 }
                 
                 calculateDelivery();
                 calculateTwoHourTotals();
+                generateTimePeriodHTML();
                 updateUI();
+                showToast(`Dados copiados do período ${previousPeriod} para ${state.activePeriod}`, 'success');
                 
-                const prevDateFormatted = formatDateDisplay(prevDate);
-                showToast(`Dados do período ${state.activePeriod} copiados de ${prevDateFormatted}!`, 'success');
+                // Add to history
+                addToHistory('copy-period', { date: state.currentDate, from: previousPeriod, to: state.activePeriod });
             };
             
-            // Manage fronts modal
+            // Show manage fronts modal
             const showManageFrontsModal = () => {
                 updateFrontsList();
                 toggleModal(elements.manageFrontsModal, true);
             };
             
-            // Update fronts list in modal
+            // Update the list of fronts in the modal
             const updateFrontsList = () => {
                 const frontsList = document.getElementById('fronts-list');
                 if (!frontsList) return;
                 
+                // Clear existing list
                 frontsList.innerHTML = '';
                 
+                // Add each front to the list
                 state.fronts.forEach(front => {
                     const listItem = document.createElement('li');
-                    listItem.className = 'flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150';
+                    listItem.className = 'px-4 py-3 bg-white dark:bg-gray-800 flex justify-between items-center';
                     
                     listItem.innerHTML = `
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 rounded-md bg-primary flex items-center justify-center text-white font-bold text-sm mr-3">F${front}</div>
-                            <div>
-                                <div class="font-medium text-gray-900 dark:text-gray-100">Frente ${front}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">Frente de entrega</div>
-                            </div>
-                        </div>
-                        <button class="remove-front-btn text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1 rounded focus:outline-none focus:ring-2 focus:ring-red-500" data-front="${front}">
+                        <span class="font-medium">Frente ${front}</span>
+                        <button class="remove-front-btn text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1" data-front="${front}" aria-label="Remover Frente ${front}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                         </button>
                     `;
                     
-                    // Add remove button functionality
-                    const removeBtn = listItem.querySelector('.remove-front-btn');
-                    removeBtn.addEventListener('click', function() {
-                        const frontToRemove = this.getAttribute('data-front');
+                    frontsList.appendChild(listItem);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-front-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const front = this.getAttribute('data-front');
                         showConfirmationModal(
                             'Remover Frente',
-                            `Tem certeza que deseja remover a Frente ${frontToRemove}? Todos os dados associados serão perdidos.`,
-                            () => removeFront(frontToRemove)
+                            `Tem certeza que deseja remover a Frente ${front}? Todos os dados associados serão excluídos.`,
+                            () => removeFront(front)
                         );
                     });
-                    
-                    frontsList.appendChild(listItem);
                 });
             };
             
-            // Add new front
+            // Add a new front
             const addFront = () => {
-                const newFrontInput = document.getElementById('new-front-input');
-                if (!newFrontInput) return;
+                const input = document.getElementById('new-front-input');
+                if (!input) return;
                 
-                const newFront = newFrontInput.value.trim();
+                const frontValue = input.value.trim();
                 
-                if (!newFront) {
-                    showToast('Por favor, insira um número para a frente.', 'warning');
+                // Validate input
+                if (!frontValue) {
+                    showToast('Por favor, informe o número da frente', 'error');
                     return;
                 }
                 
-                if (state.fronts.includes(newFront)) {
-                    showToast('Esta frente já existe.', 'warning');
+                // Check if it's a valid front number (numbers only)
+                if (!/^\d+$/.test(frontValue)) {
+                    showToast('O número da frente deve conter apenas dígitos', 'error');
+                    return;
+                }
+                
+                // Check if front already exists
+                if (state.fronts.includes(frontValue)) {
+                    showToast(`A Frente ${frontValue} já existe`, 'error');
                     return;
                 }
                 
                 // Add to fronts array
-                state.fronts.push(newFront);
-                state.fronts.sort();
+                state.fronts.push(frontValue);
                 
-                // Initialize data structures for new front
-                initializeDataStructures();
-                
-                // Clear input
-                newFrontInput.value = '';
-                
-                // Update fronts list
-                updateFrontsList();
-                
-                // Regenerate time period HTML if on that page
-                if (state.currentPage === 'entrega-hora') {
-                    generateTimePeriodHTML();
-                }
-                
-                // Update dashboard if on that page
-                if (state.currentPage === 'dashboard') {
-                    updateDashboardCharts();
-                    updateDetailedFrontTable();
-                }
-                
-                showToast(`Frente ${newFront} adicionada com sucesso!`, 'success');
-            };
-            
-            // Remove front
-            const removeFront = (frontToRemove) => {
-                // Remove from fronts array
-                state.fronts = state.fronts.filter(front => front !== frontToRemove);
-                
-                // Remove data for this front from all dates
+                // Initialize data structures for the new front for all dates
                 for (const date in state.density) {
-                    if (state.density[date][frontToRemove]) {
-                        delete state.density[date][frontToRemove];
-                    }
-                    if (state.trips[date][frontToRemove]) {
-                        delete state.trips[date][frontToRemove];
-                    }
-                    if (state.delivery[date][frontToRemove]) {
-                        delete state.delivery[date][frontToRemove];
-                    }
-                    if (state.potential[date][frontToRemove]) {
-                        delete state.potential[date][frontToRemove];
-                    }
-                    
-                    for (const period in state.twoHourDelivery[date] || {}) {
-                        if (state.twoHourDelivery[date][period][frontToRemove] !== undefined) {
-                            delete state.twoHourDelivery[date][period][frontToRemove];
-                        }
-                        if (state.twoHourPotential[date][period][frontToRemove] !== undefined) {
-                            delete state.twoHourPotential[date][period][frontToRemove];
-                        }
-                        if (state.difference[date][period][frontToRemove] !== undefined) {
-                            delete state.difference[date][period][frontToRemove];
-                        }
-                    }
-                }
-                
-                // Update fronts list
-                updateFrontsList();
-                
-                // Regenerate time period HTML if on that page
-                if (state.currentPage === 'entrega-hora') {
-                    generateTimePeriodHTML();
-                }
-                
-                // Update dashboard if on that page
-                if (state.currentPage === 'dashboard') {
-                    updateDashboardCharts();
-                    updateDetailedFrontTable();
-                }
-                
-                showToast(`Frente ${frontToRemove} removida com sucesso!`, 'success');
-            };
-            
-            // Export functions
-            const exportJSON = () => {
-                const dataToExport = {
-                    currentDate: state.currentDate,
-                    fronts: state.fronts,
-                    density: state.density,
-                    trips: state.trips,
-                    delivery: state.delivery,
-                    potential: state.potential,
-                    twoHourDelivery: state.twoHourDelivery,
-                    twoHourPotential: state.twoHourPotential,
-                    difference: state.difference,
-                    exportDate: new Date().toISOString()
-                };
-                
-                const jsonString = JSON.stringify(dataToExport, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `entrega-safra-${state.currentDate}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('Dados exportados em JSON com sucesso!', 'success');
-            };
-            
-            const exportCSV = () => {
-                if (typeof Papa === 'undefined') {
-                    showToast('Biblioteca de CSV não carregada. Usando export básico.', 'warning');
-                    exportCSVBasic();
-                    return;
-                }
-                
-                const csvData = [];
-                
-                // Add header
-                csvData.push([
-                    'Data', 'Frente', 'Periodo', 'Entrega_2H', 'Potencial_2H', 'Diferenca', 'Eficiencia_%'
-                ]);
-                
-                // Add data for current date
-                for (const period in state.timePeriodsMap) {
-                    for (const front of state.fronts) {
-                        const entrega = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        const potencial = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
-                        const diferenca = entrega - potencial;
-                        const eficiencia = potencial > 0 ? (entrega / potencial) * 100 : 0;
-                        
-                        csvData.push([
-                            state.currentDate,
-                            `F${front}`,
-                            period,
-                            entrega.toFixed(2),
-                            potencial.toFixed(2),
-                            diferenca.toFixed(2),
-                            eficiencia.toFixed(1)
-                        ]);
-                    }
-                }
-                
-                const csv = Papa.unparse(csvData);
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `entrega-safra-${state.currentDate}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('Dados exportados em CSV com sucesso!', 'success');
-            };
-            
-            const exportCSVBasic = () => {
-                let csvContent = 'Data,Frente,Periodo,Entrega_2H,Potencial_2H,Diferenca,Eficiencia_%\n';
-                
-                for (const period in state.timePeriodsMap) {
-                    for (const front of state.fronts) {
-                        const entrega = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        const potencial = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
-                        const diferenca = entrega - potencial;
-                        const eficiencia = potencial > 0 ? (entrega / potencial) * 100 : 0;
-                        
-                        csvContent += `${state.currentDate},F${front},${period},${entrega.toFixed(2)},${potencial.toFixed(2)},${diferenca.toFixed(2)},${eficiencia.toFixed(1)}\n`;
-                    }
-                }
-                
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `entrega-safra-${state.currentDate}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            };
-            
-            const exportPDF = () => {
-                if (typeof jsPDF === 'undefined') {
-                    showToast('Biblioteca de PDF não carregada.', 'error');
-                    return;
-                }
-                
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Add title
-                doc.setFontSize(20);
-                doc.text('Relatório de Entrega de Safra', 20, 20);
-                
-                // Add date
-                doc.setFontSize(12);
-                doc.text(`Data: ${formatDateDisplay(state.currentDate)}`, 20, 35);
-                
-                // Prepare table data
-                const tableData = [];
-                
-                // Add header
-                const headers = ['Frente', 'Período', 'Entrega 2H', 'Potencial 2H', 'Diferença', 'Eficiência %'];
-                
-                // Add data
-                for (const period in state.timePeriodsMap) {
-                    for (const front of state.fronts) {
-                        const entrega = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        const potencial = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
-                        const diferenca = entrega - potencial;
-                        const eficiencia = potencial > 0 ? (entrega / potencial) * 100 : 0;
-                        
-                        tableData.push([
-                            `F${front}`,
-                            period,
-                            entrega.toFixed(2),
-                            potencial.toFixed(2),
-                            diferenca.toFixed(2),
-                            eficiencia.toFixed(1) + '%'
-                        ]);
-                    }
-                }
-                
-                // Add table
-                if (doc.autoTable) {
-                    doc.autoTable({
-                        head: [headers],
-                        body: tableData,
-                        startY: 50,
-                        styles: { fontSize: 8 },
-                        headStyles: { fillColor: [93, 92, 222] }
-                    });
-                } else {
-                    // Fallback if autoTable is not available
-                    let y = 50;
-                    doc.setFontSize(10);
-                    
-                    // Add headers
-                    let x = 20;
-                    headers.forEach(header => {
-                        doc.text(header, x, y);
-                        x += 30;
-                    });
-                    y += 10;
-                    
-                    // Add data
-                    tableData.forEach(row => {
-                        x = 20;
-                        row.forEach(cell => {
-                            doc.text(cell.toString(), x, y);
-                            x += 30;
-                        });
-                        y += 8;
-                    });
-                }
-                
-                // Save PDF
-                doc.save(`entrega-safra-${state.currentDate}.pdf`);
-                
-                showToast('PDF exportado com sucesso!', 'success');
-            };
-            
-            const exportDashboard = () => {
-                if (typeof jsPDF === 'undefined') {
-                    showToast('Biblioteca de PDF não carregada.', 'error');
-                    return;
-                }
-                
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Add title
-                doc.setFontSize(20);
-                doc.text('Dashboard - Gestão de Entrega de Safra', 20, 20);
-                
-                // Add date
-                doc.setFontSize(12);
-                doc.text(`Data: ${formatDateDisplay(state.currentDate)}`, 20, 35);
-                
-                // Add summary statistics
-                let y = 55;
-                doc.setFontSize(14);
-                doc.text('Resumo Estatístico:', 20, y);
-                y += 15;
-                
-                doc.setFontSize(10);
-                
-                // Calculate totals
-                const totalDelivery = Object.keys(state.delivery[state.currentDate] || {}).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.delivery[state.currentDate][front] || {}).reduce((hourSum, hour) => {
-                        return hourSum + (state.delivery[state.currentDate][front][hour] || 0);
-                    }, 0);
-                }, 0);
-                
-                const totalPotential = Object.keys(state.twoHourPotential[state.currentDate] || {}).reduce((periodSum, period) => {
-                    return periodSum + Object.keys(state.twoHourPotential[state.currentDate][period] || {}).reduce((frontSum, front) => {
-                        return frontSum + (state.twoHourPotential[state.currentDate][period][front] || 0);
-                    }, 0);
-                }, 0);
-                
-                const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
-                
-                doc.text(`Total Entregue: ${totalDelivery.toFixed(2)} toneladas`, 20, y);
-                y += 8;
-                doc.text(`Total Potencial: ${totalPotential.toFixed(2)} toneladas`, 20, y);
-                y += 8;
-                doc.text(`Eficiência Geral: ${efficiency.toFixed(1)}%`, 20, y);
-                y += 15;
-                
-                // Add detailed table
-                doc.setFontSize(12);
-                doc.text('Detalhamento por Frente:', 20, y);
-                y += 10;
-                
-                const tableData = [];
-                const headers = ['Frente', 'Total Entregue', 'Total Previsto', 'Não Entregue', 'Eficiência %', 'Viagens'];
-                
-                state.fronts.forEach(front => {
-                    let frontDelivery = 0;
-                    let frontPotential = 0;
-                    let frontTrips = 0;
-                    
-                    // Calculate totals for this front
-                    for (const period in state.timePeriodsMap) {
-                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
-                    }
+                    // Initialize density, trips, delivery, potential for this date
+                    state.density[date][frontValue] = {};
+                    state.trips[date][frontValue] = {};
+                    state.delivery[date][frontValue] = {};
+                    state.potential[date][frontValue] = {};
                     
                     for (const hour of state.hours) {
-                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        state.density[date][frontValue][hour] = 0;
+                        state.trips[date][frontValue][hour] = 0;
+                        state.delivery[date][frontValue][hour] = 0;
+                        state.potential[date][frontValue][hour] = 0;
                     }
                     
-                    const frontEfficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
-                    const naoEntregue = frontPotential - frontDelivery;
-                    
-                    tableData.push([
-                        `F${front}`,
-                        frontDelivery.toFixed(2),
-                        frontPotential.toFixed(2),
-                        naoEntregue > 0 ? `-${naoEntregue.toFixed(2)}` : '0.00',
-                        frontEfficiency.toFixed(1) + '%',
-                        frontTrips.toString()
-                    ]);
-                });
+                    // Initialize period summaries for this date and front
+                    for (const period in state.timePeriodsMap) {
+                        if (!state.twoHourDelivery[date][period]) {
+                            state.twoHourDelivery[date][period] = {};
+                        }
+                        if (!state.twoHourPotential[date][period]) {
+                            state.twoHourPotential[date][period] = {};
+                        }
+                        if (!state.difference[date][period]) {
+                            state.difference[date][period] = {};
+                        }
+                        
+                        state.twoHourDelivery[date][period][frontValue] = 0;
+                        state.twoHourPotential[date][period][frontValue] = 0;
+                        state.difference[date][period][frontValue] = 0;
+                    }
+                }
                 
-                if (doc.autoTable) {
-                    doc.autoTable({
-                        head: [headers],
-                        body: tableData,
-                        startY: y,
-                        styles: { fontSize: 8 },
-                        headStyles: { fillColor: [93, 92, 222] }
+                // Clear input
+                input.value = '';
+                
+                // Update UI
+                updateFrontsList();
+                
+                // Regenerate time period HTML to include the new front
+                generateTimePeriodHTML();
+                
+                // Update charts that display front data
+                updateCharts();
+                
+                // Update the detailed front table
+                updateDetailedFrontTable();
+                
+                showToast(`Frente ${frontValue} adicionada com sucesso`, 'success');
+                
+                // Add to history
+                addToHistory('add-front', { front: frontValue });
+                
+                // Save data
+                saveData();
+            };
+            
+            // Remove a front
+            const removeFront = (front) => {
+                // Find the index of the front
+                const index = state.fronts.indexOf(front);
+                if (index === -1) return;
+                
+                // Remove from fronts array
+                state.fronts.splice(index, 1);
+                
+                // Remove data structures for all dates
+                for (const date in state.density) {
+                    // Remove density, trips, delivery, potential
+                    if (state.density[date][front]) delete state.density[date][front];
+                    if (state.trips[date][front]) delete state.trips[date][front];
+                    if (state.delivery[date][front]) delete state.delivery[date][front];
+                    if (state.potential[date][front]) delete state.potential[date][front];
+                    
+                    // Remove from period summaries
+                    for (const period in state.timePeriodsMap) {
+                        if (state.twoHourDelivery[date]?.[period]?.[front]) {
+                            delete state.twoHourDelivery[date][period][front];
+                        }
+                        if (state.twoHourPotential[date]?.[period]?.[front]) {
+                            delete state.twoHourPotential[date][period][front];
+                        }
+                        if (state.difference[date]?.[period]?.[front]) {
+                            delete state.difference[date][period][front];
+                        }
+                    }
+                }
+                
+                // Update UI
+                updateFrontsList();
+                
+                // Regenerate time period HTML
+                generateTimePeriodHTML();
+                
+                // Update charts
+                updateCharts();
+                
+                // Update the detailed front table
+                updateDetailedFrontTable();
+                
+                showToast(`Frente ${front} removida com sucesso`, 'success');
+                
+                // Add to history
+                addToHistory('remove-front', { front });
+                
+                // Save data
+                saveData();
+                
+                // Close modal if no fronts left
+                if (state.fronts.length === 0) {
+                    toggleModal(elements.manageFrontsModal, false);
+                }
+            };
+            
+            // Show confirmation modal
+            const showConfirmationModal = (title, message, confirmCallback) => {
+                const modalTitle = document.getElementById('modal-title');
+                const modalMessage = document.getElementById('modal-message');
+                const modalConfirm = document.getElementById('modal-confirm');
+                
+                if (modalTitle && modalMessage && modalConfirm) {
+                    modalTitle.textContent = title;
+                    modalMessage.textContent = message;
+                    
+                    // Remove previous event listener
+                    const newModalConfirm = modalConfirm.cloneNode(true);
+                    modalConfirm.parentNode.replaceChild(newModalConfirm, modalConfirm);
+                    
+                    // Add new event listener
+                    newModalConfirm.addEventListener('click', function() {
+                        if (typeof confirmCallback === 'function') {
+                            confirmCallback();
+                        }
+                        toggleModal(elements.confirmationModal, false);
                     });
-                }
-                
-                doc.save(`dashboard-${state.currentDate}.pdf`);
-                showToast('Dashboard exportado em PDF com sucesso!', 'success');
-            };
-            
-            // Search function
-            const performSearch = () => {
-                const searchTerm = document.getElementById('global-search')?.value.toLowerCase().trim();
-                
-                if (!searchTerm) {
-                    showToast('Digite um termo para pesquisar.', 'warning');
-                    return;
-                }
-                
-                // Simple search logic - in a real app this would be more sophisticated
-                let results = [];
-                
-                // Search in fronts
-                state.fronts.forEach(front => {
-                    if (front.includes(searchTerm) || `f${front}`.includes(searchTerm) || `frente${front}`.includes(searchTerm)) {
-                        results.push({
-                            type: 'front',
-                            title: `Frente ${front}`,
-                            description: 'Dados de entrega por hora',
-                            action: () => {
-                                showPage('entrega-hora');
-                                toggleModal(elements.searchModal, false);
-                            }
-                        });
-                    }
-                });
-                
-                // Search in periods
-                Object.keys(state.timePeriodsMap).forEach(period => {
-                    if (period.includes(searchTerm) || period.replace('-', ':').includes(searchTerm)) {
-                        results.push({
-                            type: 'period',
-                            title: `Período ${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`,
-                            description: 'Dados de entrega do período',
-                            action: () => {
-                                showPage('entrega-hora');
-                                switchTimePeriodTab(period);
-                                toggleModal(elements.searchModal, false);
-                            }
-                        });
-                    }
-                });
-                
-                // Search in pages
-                const pages = [
-                    { key: 'dashboard', name: 'Dashboard', desc: 'Visão geral do desempenho' },
-                    { key: 'entrega-hora', name: 'Entrega por Hora', desc: 'Registro de entregas por período' },
-                    { key: 'relatorios', name: 'Relatórios', desc: 'Análises e relatórios detalhados' },
-                    { key: 'metas', name: 'Metas', desc: 'Acompanhamento de metas' },
-                    { key: 'historico', name: 'Histórico', desc: 'Dados de dias anteriores' },
-                    { key: 'configuracoes', name: 'Configurações', desc: 'Configurações do sistema' }
-                ];
-                
-                pages.forEach(page => {
-                    if (page.name.toLowerCase().includes(searchTerm) || page.key.includes(searchTerm)) {
-                        results.push({
-                            type: 'page',
-                            title: page.name,
-                            description: page.desc,
-                            action: () => {
-                                showPage(page.key);
-                                toggleModal(elements.searchModal, false);
-                            }
-                        });
-                    }
-                });
-                
-                if (results.length === 0) {
-                    showToast('Nenhum resultado encontrado.', 'info');
-                } else {
-                    showToast(`${results.length} resultado(s) encontrado(s).`, 'success');
                     
-                    // Execute first result if only one found
-                    if (results.length === 1) {
-                        results[0].action();
-                    }
+                    // Show modal
+                    toggleModal(elements.confirmationModal, true);
                 }
             };
             
-            // Calendar functions for date range selection
+            // Show toast notification
+            const showToast = (message, type = 'info') => {
+                if (!elements.toastContainer) return;
+                
+                const toast = document.createElement('div');
+                toast.className = `p-4 mb-3 rounded-md shadow-md transform transition-all duration-300 ease-in-out translate-x-0 opacity-100 max-w-md`;
+                
+                let bgColor, textColor, icon;
+                
+                switch (type) {
+                    case 'success':
+                        bgColor = 'bg-success-500 dark:bg-success-600';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>`;
+                        break;
+                    case 'error':
+                        bgColor = 'bg-danger-500 dark:bg-danger-600';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>`;
+                        break;
+                    case 'warning':
+                        bgColor = 'bg-warning-500 dark:bg-warning-600';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>`;
+                        break;
+                    default: // info
+                        bgColor = 'bg-primary dark:bg-primary-600';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>`;
+                }
+                
+                toast.className += ` ${bgColor} ${textColor}`;
+                
+                toast.innerHTML = `
+                    <div class="flex items-center">
+                        ${icon}
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                elements.toastContainer.appendChild(toast);
+                
+                // Animate entry
+                setTimeout(() => {
+                    toast.classList.add('translate-y-2');
+                }, 10);
+                
+                // Auto-remove toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-0', 'opacity-100');
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode === elements.toastContainer) {
+                            elements.toastContainer.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+                
+                // Add click-to-dismiss functionality
+                toast.addEventListener('click', function() {
+                    toast.classList.remove('translate-x-0', 'opacity-100');
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode === elements.toastContainer) {
+                            elements.toastContainer.removeChild(toast);
+                        }
+                    }, 300);
+                });
+            };
+            
+            // Generate calendar days
             const generateCalendarDays = () => {
                 const calendarDays = document.getElementById('calendar-days');
                 const currentMonthYear = document.getElementById('current-month-year');
+                const startDateInput = document.getElementById('start-date');
+                const endDateInput = document.getElementById('end-date');
                 
                 if (!calendarDays || !currentMonthYear) return;
                 
+                // Clear previous calendar
                 calendarDays.innerHTML = '';
                 
+                // Set current month and year
                 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 currentMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
                 
+                // Get first day of month and number of days
                 const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
                 const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
                 
@@ -4559,103 +4334,84 @@
                 }
                 
                 // Add days
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayCell = document.createElement('div');
-                    const cellDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+                    currentDate.setHours(0, 0, 0, 0);
                     
                     dayCell.className = 'calendar-day h-10 flex items-center justify-center rounded-full cursor-pointer';
-                    dayCell.textContent = day;
-                    dayCell.setAttribute('data-date', cellDate.toISOString().split('T')[0]);
                     
-                    // Add click event
+                    // Highlight current day
+                    if (currentDate.getTime() === today.getTime()) {
+                        dayCell.classList.add('current');
+                    }
+                    
+                    // Highlight selected range
+                    if (state.calendar.startDate && state.calendar.endDate) {
+                        if (currentDate.getTime() >= state.calendar.startDate.getTime() && 
+                            currentDate.getTime() <= state.calendar.endDate.getTime()) {
+                            dayCell.classList.add('selected');
+                        }
+                    }
+                    
+                    // Highlight dates with data
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    if (state.availableDates.includes(dateStr)) {
+                        dayCell.classList.add('has-data');
+                    }
+                    
+                    dayCell.textContent = day;
+                    
+                    // Add click event to select date range
                     dayCell.addEventListener('click', function() {
-                        const clickedDate = new Date(this.getAttribute('data-date'));
-                        
                         if (!state.calendar.startDate || (state.calendar.startDate && state.calendar.endDate)) {
-                            // First selection or reset
-                            state.calendar.startDate = clickedDate;
+                            // Start new selection
+                            state.calendar.startDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
                             state.calendar.endDate = null;
                             
-                            // Clear previous selections
-                            document.querySelectorAll('.calendar-day').forEach(cell => {
-                                cell.classList.remove('selected', 'in-range');
-                            });
-                            
-                            this.classList.add('selected');
-                        } else if (clickedDate < state.calendar.startDate) {
-                            // Clicked date is before start date, make it the new start date
-                            state.calendar.startDate = clickedDate;
-                            
-                            // Clear previous selections
-                            document.querySelectorAll('.calendar-day').forEach(cell => {
-                                cell.classList.remove('selected', 'in-range');
-                            });
-                            
-                            this.classList.add('selected');
+                            // Update inputs
+                            if (startDateInput) startDateInput.value = formatDate(state.calendar.startDate);
+                            if (endDateInput) endDateInput.value = '';
                         } else {
-                            // Second selection - set end date
-                            state.calendar.endDate = clickedDate;
+                            // Complete selection
+                            const clickedDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
                             
-                            // Clear previous range styles
-                            document.querySelectorAll('.calendar-day').forEach(cell => {
-                                cell.classList.remove('in-range');
-                            });
+                            // Ensure end date is after start date
+                            if (clickedDate >= state.calendar.startDate) {
+                                state.calendar.endDate = clickedDate;
+                            } else {
+                                state.calendar.endDate = state.calendar.startDate;
+                                state.calendar.startDate = clickedDate;
+                            }
                             
-                            // Mark range
-                            document.querySelectorAll('.calendar-day').forEach(cell => {
-                                const cellDate = new Date(cell.getAttribute('data-date'));
-                                if (cellDate >= state.calendar.startDate && cellDate <= state.calendar.endDate) {
-                                    cell.classList.add('in-range');
-                                }
-                            });
+                            // Update inputs
+                            if (startDateInput) startDateInput.value = formatDate(state.calendar.startDate);
+                            if (endDateInput) endDateInput.value = formatDate(state.calendar.endDate);
                         }
                         
-                        updateDateRangeInputs();
+                        // Redraw calendar to show selection
+                        generateCalendarDays();
                     });
                     
                     calendarDays.appendChild(dayCell);
                 }
             };
             
-            // Update date range inputs
-            const updateDateRangeInputs = () => {
-                const startDateInput = document.getElementById('start-date');
-                const endDateInput = document.getElementById('end-date');
-                
-                if (startDateInput && state.calendar.startDate) {
-                    startDateInput.value = formatDate(state.calendar.startDate);
-                }
-                
-                if (endDateInput && state.calendar.endDate) {
-                    endDateInput.value = formatDate(state.calendar.endDate);
-                } else if (endDateInput) {
-                    endDateInput.value = '';
-                }
-            };
-            
-            // Format date for display
-            const formatDate = (date) => {
-                if (!date) return '';
-                
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                
-                return `${day}/${month}/${year}`;
-            };
-            
-            // History functions
+            // Update history calendar
             const updateHistoryCalendar = () => {
                 if (!elements.historyCalendar || !elements.historyMonthYear) return;
                 
-                // Clear calendar
+                // Clear previous calendar
                 elements.historyCalendar.innerHTML = '';
                 
                 // Set month and year display
                 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 elements.historyMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
                 
-                // Generate calendar
+                // Get first day of month and number of days
                 const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
                 const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
                 
@@ -4676,27 +4432,42 @@
                     currentDate.setHours(0, 0, 0, 0);
                     const dateStr = currentDate.toISOString().split('T')[0];
                     
-                    dayCell.className = 'h-12 flex items-center justify-center rounded-lg cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-primary';
+                    dayCell.className = 'h-12 flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200';
+                    
+                    // Add date number
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'text-sm font-medium';
+                    dateSpan.textContent = day;
+                    dayCell.appendChild(dateSpan);
                     
                     // Highlight current date
+                    if (dateStr === state.currentDate) {
+                        dayCell.classList.add('bg-primary/10', 'dark:bg-primary/20');
+                        dateSpan.classList.add('text-primary', 'font-bold');
+                    }
+                    
+                    // Highlight today
                     if (currentDate.getTime() === today.getTime()) {
-                        dayCell.classList.add('bg-primary', 'text-white');
+                        dayCell.classList.add('border-2', 'border-primary');
                     }
                     
                     // Mark dates with data
                     if (state.availableDates.includes(dateStr)) {
-                        dayCell.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
+                        const dataIndicator = document.createElement('div');
+                        dataIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mt-1';
+                        dayCell.appendChild(dataIndicator);
                     }
                     
-                    dayCell.textContent = day;
+                    // Set date attribute for easier access
                     dayCell.setAttribute('data-date', dateStr);
                     
-                    // Add click event to view date data
+                    // Add click event to select date
                     dayCell.addEventListener('click', function() {
                         const selectedDate = this.getAttribute('data-date');
-                        if (selectedDate && state.availableDates.includes(selectedDate)) {
+                        if (selectedDate) {
                             changeCurrentDate(selectedDate);
-                            showPage('entrega-hora');
+                            updateHistoryCalendar();
+                            updateHistoryTable();
                         }
                     });
                     
@@ -4704,6 +4475,7 @@
                 }
             };
             
+            // Navigate history month
             const navigateHistoryMonth = (direction) => {
                 state.calendar.currentMonth += direction;
                 if (state.calendar.currentMonth > 11) {
@@ -4717,27 +4489,33 @@
                 updateHistoryCalendar();
             };
             
+            // Update history table
             const updateHistoryTable = () => {
                 if (!elements.historyTableBody || !elements.historyEmptyState) return;
                 
-                // Clear table
-                elements.historyTableBody.innerHTML = '';
-                
-                // Get filter selection
+                // Get selected period filter
                 const periodFilter = document.getElementById('history-period-filter')?.value || 'all';
                 
-                // Get all available dates and sort them in descending order (newest first)
-                const sortedDates = [...state.availableDates].sort().reverse();
+                // Clear previous table data
+                elements.historyTableBody.innerHTML = '';
                 
-                if (sortedDates.length === 0) {
+                // Get available dates (sorted from newest to oldest)
+                const dates = [...state.availableDates].sort((a, b) => {
+                    return new Date(b) - new Date(a);
+                });
+                
+                if (dates.length === 0) {
+                    // Show empty state
                     elements.historyEmptyState.classList.remove('hidden');
                     return;
-                } else {
-                    elements.historyEmptyState.classList.add('hidden');
                 }
                 
-                // Process each date
-                sortedDates.forEach(date => {
+                elements.historyEmptyState.classList.add('hidden');
+                
+                // Add row for each date
+                dates.forEach(date => {
+                    const row = document.createElement('tr');
+                    
                     // Calculate totals for this date
                     let totalDelivery = 0;
                     let totalPotential = 0;
@@ -4745,17 +4523,19 @@
                     let densitySum = 0;
                     let densityCount = 0;
                     
-                    if (periodFilter === 'all') {
-                        // Calculate for all periods
-                        for (const period in state.timePeriodsMap) {
-                            for (const front of state.fronts) {
-                                totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
-                                totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
-                            }
+                    // If a specific period is selected, only include that period's data
+                    if (periodFilter !== 'all') {
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[periodFilter]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[periodFilter]?.[front] || 0;
                         }
                         
-                        for (const hour of state.hours) {
-                            for (const front of state.fronts) {
+                        // Get hours for the selected period
+                        const hours = state.timePeriodsMap[periodFilter];
+                        
+                        // Calculate trips and density for these hours
+                        for (const front of state.fronts) {
+                            for (const hour of hours) {
                                 totalTrips += state.trips[date]?.[front]?.[hour] || 0;
                                 
                                 if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
@@ -4765,15 +4545,17 @@
                             }
                         }
                     } else {
-                        // Calculate for specific period
-                        for (const front of state.fronts) {
-                            totalDelivery += state.twoHourDelivery[date]?.[periodFilter]?.[front] || 0;
-                            totalPotential += state.twoHourPotential[date]?.[periodFilter]?.[front] || 0;
+                        // Include all periods' data
+                        for (const period in state.timePeriodsMap) {
+                            for (const front of state.fronts) {
+                                totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                                totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                            }
                         }
                         
-                        const hours = state.timePeriodsMap[periodFilter];
-                        for (const hour of hours) {
-                            for (const front of state.fronts) {
+                        // Calculate trips and density for all hours
+                        for (const front of state.fronts) {
+                            for (const hour of state.hours) {
                                 totalTrips += state.trips[date]?.[front]?.[hour] || 0;
                                 
                                 if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
@@ -4784,114 +4566,383 @@
                         }
                     }
                     
+                    // Calculate efficiency and average density
                     const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
                     const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
                     
-                    // Create table row
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150';
+                    // Format date for display
+                    const formattedDate = formatDateDisplay(date);
+                    
+                    // Highlight current date
+                    const isCurrentDate = date === state.currentDate;
+                    
+                    row.className = `hover:bg-gray-100 dark:hover:bg-gray-700 ${isCurrentDate ? 'bg-primary/10 dark:bg-primary/20' : ''}`;
                     
                     row.innerHTML = `
-                        <td class="px-4 py-3 whitespace-nowrap font-medium">${formatDateDisplay(date)}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-success-600 dark:text-success-400">${totalDelivery.toFixed(2)} ton</td>
-                        <td class="px-4 py-3 whitespace-nowrap">${totalPotential.toFixed(2)} ton</td>
-                        <td class="px-4 py-3 whitespace-nowrap ${getEfficiencyTextColor(efficiency)}">${efficiency.toFixed(1)}%</td>
-                        <td class="px-4 py-3 whitespace-nowrap">${totalTrips}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">${avgDensity.toFixed(2)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium ${isCurrentDate ? 'text-primary' : ''}">
+                            ${formattedDate}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">
+                            ${totalDelivery.toFixed(2)} ton
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${totalPotential.toFixed(2)} ton
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium ${getEfficiencyTextColor(efficiency)}">
+                            ${efficiency.toFixed(1)}%
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${totalTrips}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            ${avgDensity.toFixed(2)}
+                        </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex space-x-2">
-                                <button class="text-primary hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-400 text-sm" onclick="viewHistoryDate('${date}')">Ver</button>
-                                <button class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 text-sm" onclick="copyHistoryDate('${date}')">Copiar</button>
+                                <button class="view-date-btn text-primary hover:text-primary-600 dark:hover:text-primary-400 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Ver Data">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                                <button class="export-date-btn text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Exportar Data">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </td>
                     `;
                     
                     elements.historyTableBody.appendChild(row);
                 });
-            };
-            
-            const exportHistoryData = () => {
-                if (state.availableDates.length === 0) {
-                    showToast('Não há dados históricos para exportar.', 'warning');
-                    return;
-                }
                 
-                const historyData = {
-                    exportDate: new Date().toISOString(),
-                    availableDates: state.availableDates,
-                    fronts: state.fronts,
-                    data: {}
-                };
-                
-                // Export data for all available dates
-                state.availableDates.forEach(date => {
-                    historyData.data[date] = {
-                        density: state.density[date] || {},
-                        trips: state.trips[date] || {},
-                        delivery: state.delivery[date] || {},
-                        potential: state.potential[date] || {},
-                        twoHourDelivery: state.twoHourDelivery[date] || {},
-                        twoHourPotential: state.twoHourPotential[date] || {},
-                        difference: state.difference[date] || {}
-                    };
+                // Add event listeners for view and export buttons
+                document.querySelectorAll('.view-date-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        if (date) {
+                            changeCurrentDate(date);
+                            showPage('entrega-hora');
+                        }
+                    });
                 });
                 
-                const jsonString = JSON.stringify(historyData, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
+                document.querySelectorAll('.export-date-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        if (date) {
+                            exportDateData(date);
+                        }
+                    });
+                });
+            };
+            
+            // Export data for a specific date
+            const exportDateData = (date) => {
+                const formattedDate = formatDateDisplay(date);
                 
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `historico-entrega-safra.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // Create PDF with date data
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(`Relatório de Entregas - ${formattedDate}`, 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Define table headers
+                const headers = [['Período', 'Frente', 'Entrega', 'Potencial', 'Eficiência', 'Viagens', 'Densidade']];
+                
+                // Prepare table data
+                const data = [];
+                
+                for (const period in state.timePeriodsMap) {
+                    for (const front of state.fronts) {
+                        const twoHourDelivery = state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                        const twoHourPotential = state.twoHourPotential[date]?.[period]?.[front] || 0;
+                        const efficiency = twoHourPotential > 0 ? (twoHourDelivery / twoHourPotential) * 100 : 0;
+                        
+                        // Calculate trips and density for this period
+                        const hours = state.timePeriodsMap[period];
+                        let trips = 0;
+                        let densitySum = 0;
+                        let densityCount = 0;
+                        
+                        for (const hour of hours) {
+                            trips += state.trips[date]?.[front]?.[hour] || 0;
+                            
+                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[date][front][hour];
+                                densityCount++;
+                            }
+                        }
+                        
+                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                        
+                        data.push([
+                            `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`,
+                            `F${front}`,
+                            twoHourDelivery.toFixed(2),
+                            twoHourPotential.toFixed(2),
+                            `${efficiency.toFixed(1)}%`,
+                            trips.toString(),
+                            avgDensity.toFixed(2)
+                        ]);
+                    }
+                }
+                
+                // Add table
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
+                });
+                
+                // Save the PDF
+                doc.save(`safra-2025-relatorio-${date}.pdf`);
+                
+                showToast(`Relatório de ${formattedDate} exportado com sucesso!`, 'success');
+            };
+            
+            // Export history data
+            const exportHistoryData = () => {
+                // Create PDF with history data
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Histórico de Entregas - Safra 2025', 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Define table headers
+                const headers = [['Data', 'Total Entregue', 'Total Potencial', 'Eficiência', 'Viagens', 'Densidade Média']];
+                
+                // Get available dates (sorted from newest to oldest)
+                const dates = [...state.availableDates].sort((a, b) => {
+                    return new Date(b) - new Date(a);
+                });
+                
+                // Prepare table data
+                const data = dates.map(date => {
+                    // Calculate totals for this date
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    let totalTrips = 0;
+                    let densitySum = 0;
+                    let densityCount = 0;
+                    
+                    // Include all periods' data
+                    for (const period in state.timePeriodsMap) {
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                        }
+                    }
+                    
+                    // Calculate trips and density for all hours
+                    for (const front of state.fronts) {
+                        for (const hour of state.hours) {
+                            totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                            
+                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[date][front][hour];
+                                densityCount++;
+                            }
+                        }
+                    }
+                    
+                    // Calculate efficiency and average density
+                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                    
+                    // Format date for display
+                    const formattedDate = formatDateDisplay(date);
+                    
+                    return [
+                        formattedDate,
+                        totalDelivery.toFixed(2),
+                        totalPotential.toFixed(2),
+                        `${efficiency.toFixed(1)}%`,
+                        totalTrips.toString(),
+                        avgDensity.toFixed(2)
+                    ];
+                });
+                
+                // Add table
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
+                });
+                
+                // Save the PDF
+                doc.save(`safra-2025-historico.pdf`);
                 
                 showToast('Histórico exportado com sucesso!', 'success');
             };
             
-            // Global functions for history actions
-            window.viewHistoryDate = (date) => {
-                changeCurrentDate(date);
-                showPage('entrega-hora');
+            // Format date to dd/mm/yyyy
+            const formatDate = (date) => {
+                if (!date) return '';
+                return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
             };
             
-            window.copyHistoryDate = (date) => {
-                if (!state.density[date] || !state.trips[date] || !state.potential[date]) {
-                    showToast('Dados não encontrados para esta data.', 'error');
-                    return;
+            // Perform search
+            const performSearch = () => {
+                const searchInput = document.getElementById('global-search');
+                const searchTerm = searchInput?.value.trim().toLowerCase();
+                const searchResults = document.getElementById('search-results');
+                
+                if (!searchTerm || !searchResults) return;
+                
+                // Clear previous results
+                searchResults.innerHTML = '';
+                
+                // Search in fronts data
+                const frontResults = state.fronts.filter(front => 
+                    front.toLowerCase().includes(searchTerm)
+                );
+                
+                // Search in time periods
+                const periodResults = Object.keys(state.timePeriodsMap).filter(period => 
+                    period.includes(searchTerm) || 
+                    `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`.includes(searchTerm)
+                );
+                
+                // Search in dates
+                const dateResults = state.availableDates.filter(date => {
+                    const formattedDate = formatDateDisplay(date);
+                    return formattedDate.toLowerCase().includes(searchTerm);
+                });
+                
+                // Add results to the UI
+                let resultsCount = 0;
+                
+                // Add front results
+                if (frontResults.length > 0) {
+                    frontResults.forEach(front => {
+                        const resultItem = document.createElement('a');
+                        resultItem.href = '#';
+                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
+                        resultItem.innerHTML = `
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Frente ${front}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora > Período ${state.activePeriod}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        resultItem.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            showPage('entrega-hora');
+                            toggleModal(elements.searchModal, false);
+                            
+                            // Focus on this front's data in the active period
+                            const frontCell = document.querySelector(`input[data-front="${front}"]`);
+                            if (frontCell) {
+                                setTimeout(() => frontCell.focus(), 100);
+                            }
+                        });
+                        
+                        searchResults.appendChild(resultItem);
+                        resultsCount++;
+                    });
                 }
                 
-                // Copy data from the selected date to current date
-                state.density[state.currentDate] = JSON.parse(JSON.stringify(state.density[date]));
-                state.trips[state.currentDate] = JSON.parse(JSON.stringify(state.trips[date]));
-                state.delivery[state.currentDate] = JSON.parse(JSON.stringify(state.delivery[date]));
-                state.potential[state.currentDate] = JSON.parse(JSON.stringify(state.potential[date]));
-                state.twoHourDelivery[state.currentDate] = JSON.parse(JSON.stringify(state.twoHourDelivery[date]));
-                state.twoHourPotential[state.currentDate] = JSON.parse(JSON.stringify(state.twoHourPotential[date]));
-                state.difference[state.currentDate] = JSON.parse(JSON.stringify(state.difference[date]));
-                
-                // Add current date to available dates if not already there
-                if (!state.availableDates.includes(state.currentDate)) {
-                    state.availableDates.push(state.currentDate);
-                    state.availableDates.sort();
+                // Add period results
+                if (periodResults.length > 0) {
+                    periodResults.forEach(period => {
+                        const resultItem = document.createElement('a');
+                        resultItem.href = '#';
+                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
+                        resultItem.innerHTML = `
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-500 dark:text-green-300">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Período ${period.substring(0, 2)}:00-${period.substring(3, 5)}:00</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        resultItem.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            showPage('entrega-hora');
+                            switchTimePeriodTab(period);
+                            toggleModal(elements.searchModal, false);
+                        });
+                        
+                        searchResults.appendChild(resultItem);
+                        resultsCount++;
+                    });
                 }
                 
-                // Update UI
-                if (state.currentPage === 'entrega-hora') {
-                    generateTimePeriodHTML();
-                } else if (state.currentPage === 'dashboard') {
-                    updateDashboardCharts();
-                    updateDetailedFrontTable();
+                // Add date results
+                if (dateResults.length > 0) {
+                    dateResults.forEach(date => {
+                        const formattedDate = formatDateDisplay(date);
+                        
+                        const resultItem = document.createElement('a');
+                        resultItem.href = '#';
+                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
+                        resultItem.innerHTML = `
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-500 dark:text-purple-300">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${formattedDate}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Histórico Diário</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        resultItem.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            changeCurrentDate(date);
+                            showPage('entrega-hora');
+                            toggleModal(elements.searchModal, false);
+                        });
+                        
+                        searchResults.appendChild(resultItem);
+                        resultsCount++;
+                    });
                 }
                 
-                const sourceDateFormatted = formatDateDisplay(date);
-                const targetDateFormatted = formatDateDisplay(state.currentDate);
-                showToast(`Dados copiados de ${sourceDateFormatted} para ${targetDateFormatted}!`, 'success');
+                // If no results found
+                if (resultsCount === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'text-center py-4 text-gray-500 dark:text-gray-400';
+                    noResults.textContent = 'Nenhum resultado encontrado';
+                    searchResults.appendChild(noResults);
+                }
             };
             
-            // Configuration functions
+            // Update UI configuration from form fields
             const updateConfigFromUI = () => {
                 const autoSaveToggle = document.getElementById('auto-save-toggle');
                 const autoSaveInterval = document.getElementById('auto-save-interval');
@@ -4908,12 +4959,20 @@
                 if (visualAlertToggle) state.config.visualAlerts = visualAlertToggle.checked;
                 
                 // Apply dark mode setting
-                if (state.config.darkMode !== document.documentElement.classList.contains('dark')) {
-                    toggleDarkMode();
+                updateDarkMode();
+                
+                // Update auto-save timer
+                if (autoSaveTimer) {
+                    clearInterval(autoSaveTimer);
+                }
+                
+                if (state.config.autoSave) {
+                    autoSaveTimer = setInterval(saveData, state.config.autoSaveInterval * 60 * 1000);
                 }
             };
             
-            const loadConfigToUI = () => {
+            // Update UI from configuration values
+            const updateUIFromConfig = () => {
                 const autoSaveToggle = document.getElementById('auto-save-toggle');
                 const autoSaveInterval = document.getElementById('auto-save-interval');
                 const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -4927,9 +4986,14 @@
                 if (alertThreshold) alertThreshold.value = state.config.alertThreshold;
                 if (soundAlertToggle) soundAlertToggle.checked = state.config.soundAlerts;
                 if (visualAlertToggle) visualAlertToggle.checked = state.config.visualAlerts;
+                
+                // Apply dark mode setting
+                updateDarkMode();
             };
             
+            // Restore default configuration
             const restoreDefaultConfig = () => {
+                // Reset to default values
                 state.config = {
                     autoSave: true,
                     autoSaveInterval: 5,
@@ -4939,45 +5003,66 @@
                     visualAlerts: true
                 };
                 
-                loadConfigToUI();
+                // Update UI with restored values
+                updateUIFromConfig();
+                
+                // Apply dark mode setting
+                updateDarkMode();
+                
+                // Save the restored config
                 saveConfig();
                 
-                showToast('Configurações restauradas para os valores padrão!', 'success');
+                showToast('Configurações restauradas para os valores padrão', 'success');
             };
             
-            const saveConfig = () => {
-                try {
-                    localStorage.setItem('ggomes-log-config', JSON.stringify(state.config));
-                } catch (e) {
-                    console.warn('Could not save config to localStorage:', e);
-                }
-            };
-            
-            const loadConfig = () => {
-                try {
-                    const savedConfig = localStorage.getItem('ggomes-log-config');
-                    if (savedConfig) {
-                        state.config = { ...state.config, ...JSON.parse(savedConfig) };
-                    }
-                } catch (e) {
-                    console.warn('Could not load config from localStorage:', e);
-                }
-                
-                // Apply dark mode if configured
+            // Update dark mode based on config
+            const updateDarkMode = () => {
                 if (state.config.darkMode) {
                     document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
                 }
                 
-                loadConfigToUI();
+                updateDarkModeToggle();
+                updateChartsTheme();
             };
             
-            // Data persistence functions
+            // Save configuration to localStorage
+            const saveConfig = () => {
+                try {
+                    localStorage.setItem('safra-2025-config', JSON.stringify(state.config));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving config:', error);
+                    return false;
+                }
+            };
+            
+            // Load configuration from localStorage
+            const loadConfig = () => {
+                try {
+                    const savedConfig = localStorage.getItem('safra-2025-config');
+                    if (savedConfig) {
+                        const config = JSON.parse(savedConfig);
+                        state.config = { ...state.config, ...config };
+                        
+                        // Update UI with loaded config
+                        updateUIFromConfig();
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error loading config:', error);
+                }
+                
+                return false;
+            };
+            
+            // Save data to localStorage
             const saveData = () => {
                 try {
-                    const dataToSave = {
-                        currentDate: state.currentDate,
-                        availableDates: state.availableDates,
+                    const data = {
                         fronts: state.fronts,
+                        availableDates: state.availableDates,
                         density: state.density,
                         trips: state.trips,
                         delivery: state.delivery,
@@ -4985,28 +5070,29 @@
                         twoHourDelivery: state.twoHourDelivery,
                         twoHourPotential: state.twoHourPotential,
                         difference: state.difference,
+                        currentDate: state.currentDate,
                         lastSaved: new Date().toISOString()
                     };
                     
-                    localStorage.setItem('ggomes-log-data', JSON.stringify(dataToSave));
+                    localStorage.setItem('safra-2025-data', JSON.stringify(data));
                     return true;
-                } catch (e) {
-                    console.error('Could not save data to localStorage:', e);
-                    showToast('Erro ao salvar dados. Espaço de armazenamento pode estar cheio.', 'error');
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    showToast('Erro ao salvar os dados', 'error');
                     return false;
                 }
             };
             
-            const loadData = () => {
+            // Load data from localStorage
+            const loadSavedData = () => {
                 try {
-                    const savedData = localStorage.getItem('ggomes-log-data');
+                    const savedData = localStorage.getItem('safra-2025-data');
                     if (savedData) {
                         const data = JSON.parse(savedData);
                         
-                        // Restore state
-                        state.currentDate = data.currentDate || state.currentDate;
+                        // Update state with saved data
+                        state.fronts = data.fronts || state.fronts;
                         state.availableDates = data.availableDates || [];
-                        state.fronts = data.fronts || ['4001', '4002', '4007', '4009'];
                         state.density = data.density || {};
                         state.trips = data.trips || {};
                         state.delivery = data.delivery || {};
@@ -5015,125 +5101,371 @@
                         state.twoHourPotential = data.twoHourPotential || {};
                         state.difference = data.difference || {};
                         
+                        // Set current date from saved data or use today
+                        if (data.currentDate) {
+                            state.currentDate = data.currentDate;
+                        }
+                        
+                        // Make sure current date is properly initialized
+                        initializeDataStructures();
+                        
+                        // Update UI with loaded data
+                        updateDateDisplay();
+                        updateDateNavigationButtons();
+                        
+                        if (state.currentPage === 'entrega-hora') {
+                            generateTimePeriodHTML();
+                        }
+                        
+                        updateUI();
+                        showToast('Dados carregados com sucesso!', 'success');
                         return true;
                     }
-                } catch (e) {
-                    console.error('Could not load data from localStorage:', e);
-                    showToast('Erro ao carregar dados salvos.', 'error');
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    showToast('Erro ao carregar os dados salvos', 'error');
                 }
                 
                 return false;
             };
             
-            // Auto save functionality
-            const setupAutoSave = () => {
-                if (autoSaveTimer) {
-                    clearInterval(autoSaveTimer);
+            // Load initial test data
+            const loadInitialData = () => {
+                // Add the current date to available dates
+                if (!state.availableDates.includes(state.currentDate)) {
+                    state.availableDates.push(state.currentDate);
                 }
                 
-                if (state.config.autoSave) {
-                    autoSaveTimer = setInterval(() => {
-                        if (saveData()) {
-                            console.log('Auto-save completed');
+                // Example data for testing
+                for (const front of state.fronts) {
+                    if (!state.density[state.currentDate][front]) {
+                        state.density[state.currentDate][front] = {};
+                    }
+                    if (!state.trips[state.currentDate][front]) {
+                        state.trips[state.currentDate][front] = {};
+                    }
+                    if (!state.potential[state.currentDate][front]) {
+                        state.potential[state.currentDate][front] = {};
+                    }
+                    
+                    for (const hour of state.hours) {
+                        // Generate random data for demonstration
+                        state.density[state.currentDate][front][hour] = Math.random() * 20 + 60; // Random density between 60-80
+                        state.trips[state.currentDate][front][hour] = Math.floor(Math.random() * 10); // Random trips between 0-9
+                        
+                        // Only odd hours have potential
+                        if (hour % 2 !== 0) {
+                            state.potential[state.currentDate][front][hour] = Math.floor(Math.random() * 50) + 50; // Random potential between 50-100
+                        } else {
+                            state.potential[state.currentDate][front][hour] = 0;
                         }
-                    }, state.config.autoSaveInterval * 60 * 1000); // Convert minutes to milliseconds
+                    }
                 }
+                
+                // Calculate delivery and two-hour totals
+                calculateDelivery();
+                calculateTwoHourTotals();
             };
             
-            // History management
-            const addToHistory = (type, data) => {
-                state.history.push({
-                    type,
-                    data,
-                    timestamp: new Date().toISOString()
+            // Export as JSON file
+            const exportJSON = () => {
+                const data = {
+                    date: state.currentDate,
+                    fronts: state.fronts,
+                    density: state.density[state.currentDate],
+                    trips: state.trips[state.currentDate],
+                    delivery: state.delivery[state.currentDate],
+                    potential: state.potential[state.currentDate],
+                    twoHourDelivery: state.twoHourDelivery[state.currentDate],
+                    twoHourPotential: state.twoHourPotential[state.currentDate],
+                    difference: state.difference[state.currentDate],
+                    exportDate: new Date().toISOString()
+                };
+                
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `safra-2025-data-${state.currentDate}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Dados exportados com sucesso!', 'success');
+            };
+            
+            // Export as CSV file
+            const exportCSV = () => {
+                let csvContent = 'data:text/csv;charset=utf-8,';
+                
+                // Headers
+                csvContent += 'Data,Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
+                
+                // Data
+                for (const front of state.fronts) {
+                    for (const hour of state.hours) {
+                        const row = [
+                            state.currentDate,
+                            front,
+                            hour,
+                            state.density[state.currentDate]?.[front]?.[hour] || 0,
+                            state.trips[state.currentDate]?.[front]?.[hour] || 0,
+                            state.delivery[state.currentDate]?.[front]?.[hour] || 0,
+                            state.potential[state.currentDate]?.[front]?.[hour] || 0
+                        ];
+                        
+                        csvContent += row.join(',') + '\n';
+                    }
+                }
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', `safra-2025-data-${state.currentDate}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('Dados exportados com sucesso!', 'success');
+            };
+            
+            // Export as PDF file
+            const exportPDF = () => {
+                if (typeof window.jspdf === 'undefined') {
+                    showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
+                    return;
+                }
+                
+                // Create a new PDF document
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(`Relatório de Entrega de Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Define table headers
+                const headers = [['Período', 'Frente', 'Densidade', 'Viagens', 'Entrega', 'Potencial', 'Eficiência']];
+                
+                // Prepare table data
+                const data = [];
+                
+                for (const period in state.timePeriodsMap) {
+                    const hours = state.timePeriodsMap[period];
+                    const periodLabel = `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`;
+                    
+                    for (const front of state.fronts) {
+                        // Calculate density and trips for this period
+                        let densitySum = 0;
+                        let densityCount = 0;
+                        let trips = 0;
+                        
+                        for (const hour of hours) {
+                            if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[state.currentDate][front][hour];
+                                densityCount++;
+                            }
+                            trips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        }
+                        
+                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                        
+                        // Get delivery and potential for this period
+                        const delivery = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        const potential = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                        const efficiency = potential > 0 ? (delivery / potential) * 100 : 0;
+                        
+                        data.push([
+                            periodLabel,
+                            `F${front}`,
+                            avgDensity.toFixed(2),
+                            trips.toString(),
+                            delivery.toFixed(2),
+                            potential.toFixed(2),
+                            `${efficiency.toFixed(1)}%`
+                        ]);
+                    }
+                    
+                    // Add a blank row between periods for better readability
+                    if (Object.keys(state.timePeriodsMap).indexOf(period) < Object.keys(state.timePeriodsMap).length - 1) {
+                        data.push(['', '', '', '', '', '', '']);
+                    }
+                }
+                
+                // Add table
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
                 });
                 
-                // Limit history to last 100 actions
-                if (state.history.length > 100) {
-                    state.history = state.history.slice(-100);
-                }
+                // Save the PDF
+                doc.save(`safra-2025-report-${state.currentDate}.pdf`);
+                
+                showToast('Dados exportados com sucesso!', 'success');
             };
             
-            // Toast notification system
-            const showToast = (message, type = 'info', duration = 3000) => {
-                if (!elements.toastContainer) return;
-                
-                const toast = document.createElement('div');
-                toast.className = `mb-2 max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 transform transition-all duration-300 translate-x-full`;
-                
-                const colors = {
-                    success: 'text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-900/50',
-                    error: 'text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-900/50',
-                    warning: 'text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/50',
-                    info: 'text-blue-800 dark:text-blue-200 bg-blue-50 dark:bg-blue-900/50'
-                };
-                
-                const icons = {
-                    success: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`,
-                    error: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>`,
-                    warning: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>`,
-                    info: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>`
-                };
-                
-                toast.innerHTML = `
-                    <div class="p-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 ${colors[type]} p-2 rounded-full">
-                                ${icons[type]}
-                            </div>
-                            <div class="ml-3 w-0 flex-1 pt-0.5">
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${message}</p>
-                            </div>
-                            <div class="ml-4 flex-shrink-0 flex">
-                                <button class="close-toast bg-white dark:bg-gray-800 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                elements.toastContainer.appendChild(toast);
-                
-                // Animate in
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-full');
-                    toast.classList.add('translate-x-0');
-                }, 100);
-                
-                // Auto remove
-                const removeToast = () => {
-                    toast.classList.add('translate-x-full');
-                    setTimeout(() => {
-                        if (elements.toastContainer.contains(toast)) {
-                            elements.toastContainer.removeChild(toast);
-                        }
-                    }, 300);
-                };
-                
-                // Add close button functionality
-                const closeBtn = toast.querySelector('.close-toast');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', removeToast);
+            // Export dashboard as PDF
+            const exportDashboard = () => {
+                if (typeof window.jspdf === 'undefined') {
+                    showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
+                    return;
                 }
                 
-                // Auto remove after duration
-                setTimeout(removeToast, duration);
+                // Create a new PDF document
+                const doc = new jspdf.jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(`Dashboard de Desempenho - Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
+                
+                // Add date
+                doc.setFontSize(10);
+                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
+                
+                // Add summary table
+                const summaryHeaders = [['Métrica', 'Valor']];
+                
+                // Calculate summary data for current date
+                const totalDelivery = Object.keys(state.twoHourDelivery[state.currentDate] || {}).reduce((periodSum, period) => {
+                    return periodSum + Object.keys(state.twoHourDelivery[state.currentDate][period] || {}).reduce((frontSum, front) => {
+                        return frontSum + (state.twoHourDelivery[state.currentDate][period][front] || 0);
+                    }, 0);
+                }, 0);
+                
+                const totalPotential = Object.keys(state.twoHourPotential[state.currentDate] || {}).reduce((periodSum, period) => {
+                    return periodSum + Object.keys(state.twoHourPotential[state.currentDate][period] || {}).reduce((frontSum, front) => {
+                        return frontSum + (state.twoHourPotential[state.currentDate][period][front] || 0);
+                    }, 0);
+                }, 0);
+                
+                const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                
+                const totalTrips = Object.keys(state.trips[state.currentDate] || {}).reduce((frontSum, front) => {
+                    return frontSum + Object.keys(state.trips[state.currentDate][front] || {}).reduce((hourSum, hour) => {
+                        return hourSum + (state.trips[state.currentDate][front][hour] || 0);
+                    }, 0);
+                }, 0);
+                
+                // Calculate average density
+                let densitySum = 0;
+                let densityCount = 0;
+                
+                for (const front in state.density[state.currentDate] || {}) {
+                    for (const hour in state.density[state.currentDate][front] || {}) {
+                        if ((state.density[state.currentDate][front][hour] || 0) > 0) {
+                            densitySum += state.density[state.currentDate][front][hour];
+                            densityCount++;
+                        }
+                    }
+                }
+                
+                const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                
+                // Create summary data array
+                const summaryData = [
+                    ['Total Entregue', `${totalDelivery.toFixed(2)} ton`],
+                    ['Total Potencial', `${totalPotential.toFixed(2)} ton`],
+                    ['Eficiência', `${efficiency.toFixed(1)}%`],
+                    ['Total de Viagens', totalTrips.toString()],
+                    ['Densidade Média', avgDensity.toFixed(2)]
+                ];
+                
+                // Add summary table
+                doc.autoTable({
+                    head: summaryHeaders,
+                    body: summaryData,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] },
+                    margin: { top: 40 }
+                });
+                
+                // Add detailed data by front
+                const frontHeaders = [['Frente', 'Total Entregue', 'Total Previsto', 'Eficiência', 'Viagens', 'Densidade Média']];
+                const frontData = [];
+                
+                for (const front of state.fronts) {
+                    // Calculate front total delivery
+                    let frontDelivery = 0;
+                    let frontPotential = 0;
+                    let frontTrips = 0;
+                    let frontDensitySum = 0;
+                    let frontDensityCount = 0;
+                    
+                    // Calculate totals across all periods
+                    for (const period in state.timePeriodsMap) {
+                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    // Calculate trips and density
+                    for (const hour of state.hours) {
+                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        
+                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                            frontDensitySum += state.density[state.currentDate][front][hour];
+                            frontDensityCount++;
+                        }
+                    }
+                    
+                    // Calculate average density
+                    const frontAvgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
+                    
+                    // Calculate efficiency
+                    const frontEfficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
+                    
+                    frontData.push([
+                        `F${front}`,
+                        `${frontDelivery.toFixed(2)} ton`,
+                        `${frontPotential.toFixed(2)} ton`,
+                        `${frontEfficiency.toFixed(1)}%`,
+                        frontTrips.toString(),
+                        frontAvgDensity.toFixed(2)
+                    ]);
+                }
+                
+                // Add front data table
+                doc.autoTable({
+                    head: frontHeaders,
+                    body: frontData,
+                    startY: doc.lastAutoTable.finalY + 10,
+                    theme: 'striped',
+                    headStyles: { fillColor: [93, 92, 222] }
+                });
+                
+                // Save the PDF
+                doc.save(`safra-2025-dashboard-${state.currentDate}.pdf`);
+                
+                showToast('Dashboard exportado com sucesso!', 'success');
             };
             
             // Initialize the application
             const init = () => {
+                // Initialize data structures
+                initializeDataStructures();
+                
                 // Cache DOM elements
                 cacheElements();
                 
-                // Load configuration and data
+                // Load configuration
                 loadConfig();
-                loadData();
                 
-                // Initialize data structures
-                initializeDataStructures();
+                // Setup dark mode
+                updateDarkMode();
+                
+                // Load initial test data (or real data if available)
+                if (!loadSavedData()) {
+                    loadInitialData();
+                }
                 
                 // Setup event listeners
                 setupEventListeners();
@@ -5141,64 +5473,38 @@
                 // Initialize charts
                 initializeCharts();
                 
+                // Show default page (dashboard)
+                showPage('dashboard');
+                
+                // Set up auto-save interval
+                if (state.config.autoSave) {
+                    autoSaveTimer = setInterval(saveData, state.config.autoSaveInterval * 60 * 1000);
+                }
+                
                 // Update date display
                 updateDateDisplay();
                 
                 // Update date navigation buttons
                 updateDateNavigationButtons();
                 
-                // Update dark mode toggle
-                updateDarkModeToggle();
-                
-                // Setup auto save
-                setupAutoSave();
-                
-                // Initialize the current page
-                if (state.currentPage === 'entrega-hora') {
-                    generateTimePeriodHTML();
-                } else if (state.currentPage === 'dashboard') {
-                    updateDashboardCharts();
-                    updateDetailedFrontTable();
-                }
-                
-                // Show success message
-                showToast('Sistema inicializado com sucesso!', 'success');
-                
-                console.log('GGOMES-LOG System initialized successfully');
+                // Setup periodic updates
+                setInterval(updateDateDisplay, 60000); // Update every minute
             };
             
-            // Public API
             return {
-                init,
-                showToast,
-                saveData,
-                loadData,
-                state
+                init
             };
         })();
         
-        // Initialize the application when the DOM is loaded
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if theme preference exists
+            // Check for dark mode preference
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.classList.add('dark');
             }
             
-            // Initialize the app
+            // Initialize app
             App.init();
-        });
-        
-        // Handle page visibility changes for auto-save
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'hidden') {
-                // Save data before page becomes hidden
-                App.saveData();
-            }
-        });
-        
-        // Handle beforeunload for emergency save
-        window.addEventListener('beforeunload', function(e) {
-            App.saveData();
         });
     </script>
 </body>
