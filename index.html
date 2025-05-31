@@ -154,6 +154,7 @@
             -webkit-appearance: none;
             margin: 0;
         }
+        
         /* Skeleton loading effect */
         .skeleton {
             animation: skeleton-loading 1.5s infinite;
@@ -1008,6 +1009,7 @@
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Frente</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Entregue</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Previsto</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Não Entregue</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Eficiência</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Viagens</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Densidade Média</th>
@@ -1022,6 +1024,7 @@
                                             <td class="px-4 py-3 whitespace-nowrap">TOTAL</td>
                                             <td id="total-entregue" class="px-4 py-3 whitespace-nowrap">0.00</td>
                                             <td id="total-potencial" class="px-4 py-3 whitespace-nowrap">0.00</td>
+                                            <td id="total-nao-entregue" class="px-4 py-3 whitespace-nowrap text-danger-600 dark:text-danger-400">0.00</td>
                                             <td id="total-eficiencia" class="px-4 py-3 whitespace-nowrap">0%</td>
                                             <td id="total-viagens" class="px-4 py-3 whitespace-nowrap">0</td>
                                             <td id="total-densidade" class="px-4 py-3 whitespace-nowrap">0.00</td>
@@ -1070,12 +1073,15 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
                                         Exportar
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
                                     </button>
                                     <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20 transform transition-all duration-300 scale-95 origin-top-right">
                                         <div class="py-1">
-                                            <a href="#" id="export-json" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar JSON</a>
-                                            <a href="#" id="export-csv" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar CSV</a>
-                                            <a href="#" id="export-pdf" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar PDF</a>
+                                            <button id="export-json" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar JSON</button>
+                                            <button id="export-csv" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar CSV</button>
+                                            <button id="export-pdf" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">Exportar PDF</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1834,7 +1840,8 @@
                 elements.manageFrontsBtn?.addEventListener('click', showManageFrontsModal);
                 
                 // Clear period
-                elements.clearPeriodBtn?.addEventListener('click', () => {
+                elements.clearPeriodBtn?.addEventListener('click', (e) => {
+                    e.preventDefault();
                     showConfirmationModal(
                         'Limpar Período',
                         `Tem certeza que deseja limpar todos os dados do período ${state.activePeriod} para a data ${formatDateDisplay(state.currentDate)}?`,
@@ -1843,7 +1850,10 @@
                 });
                 
                 // Copy previous period
-                elements.copyPreviousBtn?.addEventListener('click', copyPreviousPeriod);
+                elements.copyPreviousBtn?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    copyPreviousPeriod();
+                });
                 
                 // Time tab buttons
                 elements.timeTabButtons.forEach(button => {
@@ -1977,14 +1987,29 @@
                 
                 // Export dropdown toggle
                 document.getElementById('export-dropdown-btn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     toggleDropdown(elements.exportDropdown);
                 });
                 
                 // Export buttons
-                document.getElementById('export-json')?.addEventListener('click', exportJSON);
-                document.getElementById('export-csv')?.addEventListener('click', exportCSV);
-                document.getElementById('export-pdf')?.addEventListener('click', exportPDF);
+                document.getElementById('export-json')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    exportJSON();
+                    toggleDropdown(elements.exportDropdown, false);
+                });
+                
+                document.getElementById('export-csv')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    exportCSV();
+                    toggleDropdown(elements.exportDropdown, false);
+                });
+                
+                document.getElementById('export-pdf')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    exportPDF();
+                    toggleDropdown(elements.exportDropdown, false);
+                });
                 
                 // Notifications dropdown toggle
                 document.getElementById('notifications-button')?.addEventListener('click', function(e) {
@@ -3767,7 +3792,7 @@
                 }
             };
             
-            // Update the detailed front table with real data
+            // Update the detailed front table with real data including non-delivered amount
             const updateDetailedFrontTable = () => {
                 if (!elements.frontDetailsTable) return;
                 
@@ -3780,6 +3805,7 @@
                 let totalViagens = 0;
                 let totalDensidadeSum = 0;
                 let totalDensidadeCount = 0;
+                let totalNaoEntregue = 0;
                 
                 // Add rows for each front
                 state.fronts.forEach(front => {
@@ -3815,6 +3841,9 @@
                     // Calculate average density
                     const avgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
                     
+                    // Calculate non-delivered amount (negative value showing what was not delivered)
+                    const naoEntregue = frontPotential - frontDelivery;
+                    
                     // Create row
                     const row = document.createElement('tr');
                     row.className = 'front-detail-row';
@@ -3826,12 +3855,13 @@
                         <td class="px-4 py-3 whitespace-nowrap font-semibold">F${front}</td>
                         <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">${frontDelivery.toFixed(2)} ton</td>
                         <td class="px-4 py-3 whitespace-nowrap">${frontPotential.toFixed(2)} ton</td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium ${naoEntregue > 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400'}">${naoEntregue > 0 ? '-' + naoEntregue.toFixed(2) : '0.00'} ton</td>
                         <td class="px-4 py-3 whitespace-nowrap font-medium ${efficiencyColor}">${efficiency.toFixed(1)}%</td>
                         <td class="px-4 py-3 whitespace-nowrap">${frontTrips}</td>
                         <td class="px-4 py-3 whitespace-nowrap">${avgDensity.toFixed(2)}</td>
                         <td class="px-4 py-3">
                             <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 relative overflow-hidden">
-                                <div class="${getProgressBarColor(efficiency)} h-2.5 rounded-full" style="width: ${Math.min(100, efficiency)}%"></div>
+                                <div class="bg-${getProgressBarColor(efficiency, true)} h-2.5 rounded-full" style="width: ${Math.min(100, efficiency)}%"></div>
                             </div>
                             <span class="text-xs mt-1 block text-right">${efficiency.toFixed(1)}%</span>
                         </td>
@@ -3843,61 +3873,83 @@
                     totalEntregue += frontDelivery;
                     totalPotencial += frontPotential;
                     totalViagens += frontTrips;
-                    totalDensidadeSum += frontDensitySum;
-                    totalDensidadeCount += frontDensityCount;
+                    totalNaoEntregue += naoEntregue;
+                    
+                    if (frontDensityCount > 0) {
+                        totalDensidadeSum += frontDensitySum;
+                        totalDensidadeCount += frontDensityCount;
+                    }
                 });
                 
-                // Update footer totals
+                // Calculate total efficiency and average density
                 const totalEfficiency = totalPotencial > 0 ? (totalEntregue / totalPotencial) * 100 : 0;
-                const totalAvgDensity = totalDensidadeCount > 0 ? totalDensidadeSum / totalDensidadeCount : 0;
+                const avgTotalDensity = totalDensidadeCount > 0 ? totalDensidadeSum / totalDensidadeCount : 0;
                 
-                document.getElementById('total-entregue').textContent = `${totalEntregue.toFixed(2)} ton`;
-                document.getElementById('total-potencial').textContent = `${totalPotencial.toFixed(2)} ton`;
-                document.getElementById('total-eficiencia').textContent = `${totalEfficiency.toFixed(1)}%`;
-                document.getElementById('total-viagens').textContent = totalViagens;
-                document.getElementById('total-densidade').textContent = totalAvgDensity.toFixed(2);
-                
+                // Update total fields
+                const totalEntregueEl = document.getElementById('total-entregue');
+                const totalPotencialEl = document.getElementById('total-potencial');
+                const totalNaoEntregueEl = document.getElementById('total-nao-entregue');
+                const totalEficienciaEl = document.getElementById('total-eficiencia');
+                const totalViagensEl = document.getElementById('total-viagens');
+                const totalDensidadeEl = document.getElementById('total-densidade');
                 const totalProgressBar = document.getElementById('total-progress-bar');
                 const totalProgressText = document.getElementById('total-progress-text');
                 
+                if (totalEntregueEl) totalEntregueEl.textContent = `${totalEntregue.toFixed(2)} ton`;
+                if (totalPotencialEl) totalPotencialEl.textContent = `${totalPotencial.toFixed(2)} ton`;
+                if (totalNaoEntregueEl) {
+                    totalNaoEntregueEl.textContent = totalNaoEntregue > 0 ? `-${totalNaoEntregue.toFixed(2)} ton` : '0.00 ton';
+                    totalNaoEntregueEl.className = `px-4 py-3 whitespace-nowrap font-medium ${totalNaoEntregue > 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400'}`;
+                }
+                if (totalEficienciaEl) {
+                    totalEficienciaEl.textContent = `${totalEfficiency.toFixed(1)}%`;
+                    totalEficienciaEl.className = `px-4 py-3 whitespace-nowrap font-medium ${getEfficiencyTextColor(totalEfficiency)}`;
+                }
+                if (totalViagensEl) totalViagensEl.textContent = totalViagens.toString();
+                if (totalDensidadeEl) totalDensidadeEl.textContent = avgTotalDensity.toFixed(2);
+                
                 if (totalProgressBar && totalProgressText) {
                     totalProgressBar.style.width = `${Math.min(100, totalEfficiency)}%`;
-                    totalProgressBar.className = `${getProgressBarColor(totalEfficiency)} h-2.5 rounded-full`;
+                    totalProgressBar.className = `bg-${getProgressBarColor(totalEfficiency, true)} h-2.5 rounded-full`;
                     totalProgressText.textContent = `${totalEfficiency.toFixed(1)}%`;
                 }
             };
             
-            // Helper function to get text color class based on efficiency percentage
+            // Get efficiency text color based on value
             const getEfficiencyTextColor = (value) => {
                 if (value >= 90) {
-                    return "text-success-600 dark:text-success-400";  // Green
+                    return 'text-green-600 dark:text-green-400';
                 } else if (value >= 75) {
-                    return "text-primary-600 dark:text-primary-400";  // Primary
+                    return 'text-primary-600 dark:text-primary-400';
                 } else if (value >= 50) {
-                    return "text-warning-600 dark:text-warning-400";  // Yellow
+                    return 'text-yellow-600 dark:text-yellow-400';
                 } else {
-                    return "text-danger-600 dark:text-danger-400";    // Red
+                    return 'text-red-600 dark:text-red-400';
                 }
             };
             
-            // Helper function to get progress bar color class based on efficiency percentage
-            const getProgressBarColor = (value) => {
-                if (value >= 90) {
-                    return "bg-success-500 dark:bg-success-600";  // Green
-                } else if (value >= 75) {
-                    return "bg-primary dark:bg-primary-600";      // Primary
-                } else if (value >= 50) {
-                    return "bg-warning-500 dark:bg-warning-600";  // Yellow
+            // Get progress bar color based on percentage
+            const getProgressBarColor = (percentage, returnClass = false) => {
+                let color;
+                
+                if (percentage >= 90) {
+                    color = returnClass ? 'green-500' : 'bg-green-500';
+                } else if (percentage >= 75) {
+                    color = returnClass ? 'primary' : 'bg-primary';
+                } else if (percentage >= 50) {
+                    color = returnClass ? 'yellow-500' : 'bg-yellow-500';
                 } else {
-                    return "bg-danger-500 dark:bg-danger-600";    // Red
+                    color = returnClass ? 'red-500' : 'bg-red-500';
                 }
+                
+                return color;
             };
             
             // Switch time period tab
             const switchTimePeriodTab = (period) => {
                 state.activePeriod = period;
                 
-                // Update time tab buttons
+                // Update tab button states
                 elements.timeTabButtons.forEach(button => {
                     button.classList.remove('bg-primary', 'text-white');
                     button.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
@@ -3908,134 +3960,495 @@
                     }
                 });
                 
-                // Hide all period contents
+                // Show/hide period content
                 document.querySelectorAll('.period-content').forEach(content => {
                     content.classList.add('hidden');
                 });
                 
-                // Show selected period content
-                const periodContent = document.getElementById(`period-${period}`);
-                if (periodContent) {
-                    periodContent.classList.remove('hidden');
+                const activePeriodContent = document.getElementById(`period-${period}`);
+                if (activePeriodContent) {
+                    activePeriodContent.classList.remove('hidden');
                 }
             };
             
-            // Show loading indicator
-            const showLoading = (show) => {
-                if (elements.loadingIndicator && elements.timePeriodContent) {
-                    if (show) {
-                        elements.loadingIndicator.classList.remove('hidden');
-                        elements.timePeriodContent.classList.add('hidden');
-                    } else {
-                        elements.loadingIndicator.classList.add('hidden');
-                        elements.timePeriodContent.classList.remove('hidden');
-                    }
-                }
-            };
-            
-            // Add to history for undo/redo
-            const addToHistory = (action, data) => {
-                state.history.push({ action, data, timestamp: new Date() });
+            // Show/hide loading indicator
+            const showLoading = (show = true) => {
+                if (!elements.loadingIndicator) return;
                 
-                // Limit history size to prevent memory issues
-                if (state.history.length > 100) {
-                    state.history.shift();
+                if (show) {
+                    elements.loadingIndicator.classList.remove('hidden');
+                } else {
+                    elements.loadingIndicator.classList.add('hidden');
                 }
             };
             
-            // Clear current period data for the current date
+            // Clear current period data
             const clearCurrentPeriod = () => {
-                const hours = state.timePeriodsMap[state.activePeriod];
+                const period = state.activePeriod;
+                
+                // Clear data for the current active period and current date
+                const hours = state.timePeriodsMap[period];
                 
                 for (const front of state.fronts) {
                     for (const hour of hours) {
-                        state.density[state.currentDate][front][hour] = 0;
-                        state.trips[state.currentDate][front][hour] = 0;
-                        state.delivery[state.currentDate][front][hour] = 0;
-                        
-                        // Reset potential only for odd hours
-                        if (hour % 2 !== 0) {
-                            state.potential[state.currentDate][front][hour] = 0;
+                        if (state.density[state.currentDate] && state.density[state.currentDate][front]) {
+                            state.density[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.trips[state.currentDate] && state.trips[state.currentDate][front]) {
+                            state.trips[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.delivery[state.currentDate] && state.delivery[state.currentDate][front]) {
+                            state.delivery[state.currentDate][front][hour] = 0;
+                        }
+                        if (state.potential[state.currentDate] && state.potential[state.currentDate][front]) {
+                            // Only clear potential for odd hours
+                            if (hour % 2 !== 0) {
+                                state.potential[state.currentDate][front][hour] = 0;
+                            }
                         }
                     }
                 }
                 
-                calculateDelivery();
+                // Recalculate two-hour totals
                 calculateTwoHourTotals();
+                
+                // Update UI
                 generateTimePeriodHTML();
-                updateUI();
-                showToast(`Período ${state.activePeriod} limpo com sucesso`, 'success');
                 
                 // Add to history
-                addToHistory('clear-period', { date: state.currentDate, period: state.activePeriod });
+                addToHistory('clear-period', { period, date: state.currentDate });
+                
+                showToast(`Período ${period} limpo com sucesso`, 'success');
             };
             
             // Copy previous period data
             const copyPreviousPeriod = () => {
-                const periods = Object.keys(state.timePeriodsMap);
-                const currentIndex = periods.indexOf(state.activePeriod);
+                const currentPeriod = state.activePeriod;
                 
-                if (currentIndex <= 0) {
-                    showToast('Não há período anterior para copiar', 'error');
+                // Find the previous period in the time periods map
+                const periods = Object.keys(state.timePeriodsMap);
+                const currentIndex = periods.indexOf(currentPeriod);
+                const previousIndex = currentIndex > 0 ? currentIndex - 1 : periods.length - 1;
+                const previousPeriod = periods[previousIndex];
+                
+                // Check if previous period has data
+                let hasData = false;
+                for (const front of state.fronts) {
+                    const delivery = state.twoHourDelivery[state.currentDate]?.[previousPeriod]?.[front] || 0;
+                    const potential = state.twoHourPotential[state.currentDate]?.[previousPeriod]?.[front] || 0;
+                    if (delivery > 0 || potential > 0) {
+                        hasData = true;
+                        break;
+                    }
+                }
+                
+                if (!hasData) {
+                    showToast(`Período anterior (${previousPeriod}) não possui dados para copiar`, 'warning');
                     return;
                 }
                 
-                const previousPeriod = periods[currentIndex - 1];
+                // Copy data from previous period to current period
+                const currentHours = state.timePeriodsMap[currentPeriod];
                 const previousHours = state.timePeriodsMap[previousPeriod];
-                const currentHours = state.timePeriodsMap[state.activePeriod];
                 
-                // Copy data from previous period
-                for (let i = 0; i < currentHours.length; i++) {
-                    const currentHour = currentHours[i];
-                    const previousHour = previousHours[i];
-                    
-                    for (const front of state.fronts) {
-                        state.density[state.currentDate][front][currentHour] = 
-                            state.density[state.currentDate][front][previousHour] || 0;
-                        state.trips[state.currentDate][front][currentHour] = 
-                            state.trips[state.currentDate][front][previousHour] || 0;
+                for (const front of state.fronts) {
+                    // Copy hour data
+                    for (let i = 0; i < currentHours.length; i++) {
+                        const currentHour = currentHours[i];
+                        const previousHour = previousHours[i];
                         
-                        // For odd hours, also copy potential
-                        if (currentHour % 2 !== 0) {
+                        // Copy density
+                        if (state.density[state.currentDate]?.[front]?.[previousHour] !== undefined) {
+                            state.density[state.currentDate][front][currentHour] = 
+                                state.density[state.currentDate][front][previousHour];
+                        }
+                        
+                        // Copy trips
+                        if (state.trips[state.currentDate]?.[front]?.[previousHour] !== undefined) {
+                            state.trips[state.currentDate][front][currentHour] = 
+                                state.trips[state.currentDate][front][previousHour];
+                        }
+                        
+                        // Copy potential (only for odd hours)
+                        if (currentHour % 2 !== 0 && state.potential[state.currentDate]?.[front]?.[previousHour] !== undefined) {
                             state.potential[state.currentDate][front][currentHour] = 
-                                state.potential[state.currentDate][front][previousHour] || 0;
+                                state.potential[state.currentDate][front][previousHour];
                         }
                     }
                 }
                 
+                // Recalculate delivery and two-hour totals
                 calculateDelivery();
                 calculateTwoHourTotals();
-                generateTimePeriodHTML();
+                
+                // Update UI
                 updateUI();
-                showToast(`Dados copiados do período ${previousPeriod} para ${state.activePeriod}`, 'success');
                 
                 // Add to history
-                addToHistory('copy-period', { date: state.currentDate, from: previousPeriod, to: state.activePeriod });
+                addToHistory('copy-period', { 
+                    from: previousPeriod, 
+                    to: currentPeriod, 
+                    date: state.currentDate 
+                });
+                
+                showToast(`Dados do período ${previousPeriod} copiados para ${currentPeriod}`, 'success');
+            };
+            
+            // Export functions
+            const exportJSON = () => {
+                const dataToExport = {
+                    date: state.currentDate,
+                    period: state.activePeriod,
+                    density: state.density[state.currentDate] || {},
+                    trips: state.trips[state.currentDate] || {},
+                    delivery: state.delivery[state.currentDate] || {},
+                    potential: state.potential[state.currentDate] || {},
+                    twoHourDelivery: state.twoHourDelivery[state.currentDate] || {},
+                    twoHourPotential: state.twoHourPotential[state.currentDate] || {},
+                    difference: state.difference[state.currentDate] || {},
+                    fronts: state.fronts,
+                    exportedAt: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                a.href = url;
+                a.download = `entrega-safra-${state.currentDate}-${state.activePeriod}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Dados exportados em JSON com sucesso!', 'success');
+            };
+            
+            const exportCSV = () => {
+                if (typeof Papa === 'undefined') {
+                    showToast('Biblioteca Papa Parse não carregada. Não é possível exportar CSV.', 'error');
+                    return;
+                }
+                
+                const csvData = [];
+                
+                // Add header
+                csvData.push([
+                    'Data',
+                    'Período',
+                    'Frente',
+                    'Hora',
+                    'Densidade',
+                    'Viagens',
+                    'Entrega',
+                    'Potencial'
+                ]);
+                
+                // Add data for current date
+                for (const front of state.fronts) {
+                    for (const hour of state.hours) {
+                        const density = state.density[state.currentDate]?.[front]?.[hour] || 0;
+                        const trips = state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        const delivery = state.delivery[state.currentDate]?.[front]?.[hour] || 0;
+                        const potential = state.potential[state.currentDate]?.[front]?.[hour] || 0;
+                        
+                        csvData.push([
+                            state.currentDate,
+                            state.activePeriod,
+                            `F${front}`,
+                            `${hour.toString().padStart(2, '0')}:00`,
+                            density.toFixed(2),
+                            trips,
+                            delivery.toFixed(2),
+                            potential
+                        ]);
+                    }
+                }
+                
+                const csv = Papa.unparse(csvData);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                a.href = url;
+                a.download = `entrega-safra-${state.currentDate}-${state.activePeriod}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Dados exportados em CSV com sucesso!', 'success');
+            };
+            
+            const exportPDF = () => {
+                if (typeof jsPDF === 'undefined') {
+                    showToast('Biblioteca jsPDF não carregada. Não é possível exportar PDF.', 'error');
+                    return;
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(16);
+                doc.text('Relatório de Entrega de Safra 2025', 20, 20);
+                
+                // Add date and period info
+                doc.setFontSize(12);
+                doc.text(`Data: ${formatDateDisplay(state.currentDate)}`, 20, 35);
+                doc.text(`Período: ${state.activePeriod}`, 20, 45);
+                
+                // Prepare table data
+                const tableData = [];
+                
+                // Add header
+                const headers = ['Frente', 'Densidade Média', 'Total Viagens', 'Total Entregue', 'Eficiência (%)'];
+                
+                // Add data for each front
+                for (const front of state.fronts) {
+                    let frontDelivery = 0;
+                    let frontPotential = 0;
+                    let frontTrips = 0;
+                    let frontDensitySum = 0;
+                    let frontDensityCount = 0;
+                    
+                    // Calculate totals for the current period
+                    for (const period in state.timePeriodsMap) {
+                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    // Calculate trips and density
+                    for (const hour of state.hours) {
+                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        
+                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                            frontDensitySum += state.density[state.currentDate][front][hour];
+                            frontDensityCount++;
+                        }
+                    }
+                    
+                    const efficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
+                    const avgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
+                    
+                    tableData.push([
+                        `F${front}`,
+                        avgDensity.toFixed(2),
+                        frontTrips.toString(),
+                        frontDelivery.toFixed(2) + ' ton',
+                        efficiency.toFixed(1) + '%'
+                    ]);
+                }
+                
+                // Add table using autoTable
+                if (doc.autoTable) {
+                    doc.autoTable({
+                        head: [headers],
+                        body: tableData,
+                        startY: 60,
+                        theme: 'grid',
+                        styles: {
+                            fontSize: 10,
+                            cellPadding: 3
+                        },
+                        headStyles: {
+                            fillColor: [93, 92, 222],
+                            textColor: 255
+                        }
+                    });
+                } else {
+                    // Fallback if autoTable is not available
+                    let yPosition = 60;
+                    doc.setFontSize(10);
+                    
+                    // Add headers
+                    headers.forEach((header, index) => {
+                        doc.text(header, 20 + (index * 35), yPosition);
+                    });
+                    
+                    yPosition += 10;
+                    
+                    // Add data
+                    tableData.forEach(row => {
+                        row.forEach((cell, index) => {
+                            doc.text(cell, 20 + (index * 35), yPosition);
+                        });
+                        yPosition += 8;
+                    });
+                }
+                
+                // Add footer
+                const pageHeight = doc.internal.pageSize.height;
+                doc.setFontSize(8);
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, pageHeight - 20);
+                doc.text('GGOMES-LOG - Gestão de Entrega de Safra', 20, pageHeight - 10);
+                
+                // Save the PDF
+                doc.save(`entrega-safra-${state.currentDate}-${state.activePeriod}.pdf`);
+                
+                showToast('Relatório PDF gerado com sucesso!', 'success');
+            };
+            
+            // Export dashboard
+            const exportDashboard = () => {
+                if (typeof jsPDF === 'undefined') {
+                    showToast('Biblioteca jsPDF não carregada. Não é possível exportar dashboard.', 'error');
+                    return;
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Dashboard - Gestão de Entrega de Safra 2025', 20, 20);
+                
+                // Add date info
+                doc.setFontSize(12);
+                doc.text(`Data: ${formatDateDisplay(state.currentDate)}`, 20, 35);
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 45);
+                
+                // Calculate summary data
+                let totalDelivery = 0;
+                let totalPotential = 0;
+                let totalTrips = 0;
+                let totalDensitySum = 0;
+                let totalDensityCount = 0;
+                
+                for (const front of state.fronts) {
+                    // Calculate delivery and potential
+                    for (const period in state.timePeriodsMap) {
+                        totalDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        totalPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    // Calculate trips and density
+                    for (const hour of state.hours) {
+                        totalTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                        
+                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
+                            totalDensitySum += state.density[state.currentDate][front][hour];
+                            totalDensityCount++;
+                        }
+                    }
+                }
+                
+                const totalEfficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                const avgDensity = totalDensityCount > 0 ? totalDensitySum / totalDensityCount : 0;
+                
+                // Add summary section
+                doc.setFontSize(14);
+                doc.text('Resumo Geral', 20, 65);
+                
+                doc.setFontSize(11);
+                doc.text(`Total Entregue: ${totalDelivery.toFixed(2)} toneladas`, 20, 80);
+                doc.text(`Total Previsto: ${totalPotential.toFixed(2)} toneladas`, 20, 90);
+                doc.text(`Eficiência Geral: ${totalEfficiency.toFixed(1)}%`, 20, 100);
+                doc.text(`Total de Viagens: ${totalTrips}`, 20, 110);
+                doc.text(`Densidade Média: ${avgDensity.toFixed(2)}`, 20, 120);
+                
+                // Add detailed front table
+                const tableHeaders = ['Frente', 'Entregue (ton)', 'Previsto (ton)', 'Eficiência (%)', 'Viagens'];
+                const tableData = [];
+                
+                state.fronts.forEach(front => {
+                    let frontDelivery = 0;
+                    let frontPotential = 0;
+                    let frontTrips = 0;
+                    
+                    // Calculate totals for this front
+                    for (const period in state.timePeriodsMap) {
+                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
+                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                    }
+                    
+                    for (const hour of state.hours) {
+                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                    }
+                    
+                    const efficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
+                    
+                    tableData.push([
+                        `F${front}`,
+                        frontDelivery.toFixed(2),
+                        frontPotential.toFixed(2),
+                        efficiency.toFixed(1) + '%',
+                        frontTrips.toString()
+                    ]);
+                });
+                
+                // Add table
+                if (doc.autoTable) {
+                    doc.autoTable({
+                        head: [tableHeaders],
+                        body: tableData,
+                        startY: 140,
+                        theme: 'grid',
+                        styles: {
+                            fontSize: 10,
+                            cellPadding: 3
+                        },
+                        headStyles: {
+                            fillColor: [93, 92, 222],
+                            textColor: 255
+                        }
+                    });
+                }
+                
+                // Add footer
+                const pageHeight = doc.internal.pageSize.height;
+                doc.setFontSize(8);
+                doc.text('GGOMES-LOG - Sistema de Gestão de Entrega de Safra', 20, pageHeight - 10);
+                
+                // Save the PDF
+                doc.save(`dashboard-${state.currentDate}.pdf`);
+                
+                showToast('Dashboard exportado em PDF com sucesso!', 'success');
             };
             
             // Show manage fronts modal
             const showManageFrontsModal = () => {
+                if (!elements.manageFrontsModal) return;
+                
                 updateFrontsList();
-                toggleModal(elements.manageFrontsModal, true);
+                
+                // Show modal with animation
+                elements.manageFrontsModal.classList.remove('hidden');
+                const innerModal = elements.manageFrontsModal.querySelector('.transform');
+                if (innerModal) {
+                    setTimeout(() => {
+                        innerModal.classList.remove('scale-95', 'opacity-0');
+                        innerModal.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }
+                
+                // Focus on input
+                const input = document.getElementById('new-front-input');
+                if (input) {
+                    setTimeout(() => input.focus(), 100);
+                }
             };
             
-            // Update the list of fronts in the modal
+            // Update fronts list in modal
             const updateFrontsList = () => {
                 const frontsList = document.getElementById('fronts-list');
                 if (!frontsList) return;
                 
-                // Clear existing list
                 frontsList.innerHTML = '';
                 
-                // Add each front to the list
                 state.fronts.forEach(front => {
                     const listItem = document.createElement('li');
-                    listItem.className = 'px-4 py-3 bg-white dark:bg-gray-800 flex justify-between items-center';
+                    listItem.className = 'px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
                     
                     listItem.innerHTML = `
-                        <span class="font-medium">Frente ${front}</span>
-                        <button class="remove-front-btn text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1" data-front="${front}" aria-label="Remover Frente ${front}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold mr-3">
+                                F
+                            </div>
+                            <span class="font-medium text-gray-900 dark:text-gray-100">Frente ${front}</span>
+                        </div>
+                        <button class="remove-front-btn text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1 rounded" data-front="${front}" title="Remover frente">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                         </button>
@@ -4050,899 +4463,307 @@
                         const front = this.getAttribute('data-front');
                         showConfirmationModal(
                             'Remover Frente',
-                            `Tem certeza que deseja remover a Frente ${front}? Todos os dados associados serão excluídos.`,
+                            `Tem certeza que deseja remover a Frente ${front}? Todos os dados associados serão perdidos.`,
                             () => removeFront(front)
                         );
                     });
                 });
             };
             
-            // Add a new front
+            // Add new front
             const addFront = () => {
                 const input = document.getElementById('new-front-input');
                 if (!input) return;
                 
                 const frontValue = input.value.trim();
                 
-                // Validate input
                 if (!frontValue) {
-                    showToast('Por favor, informe o número da frente', 'error');
+                    showToast('Digite um número para a frente', 'warning');
                     return;
                 }
                 
-                // Check if it's a valid front number (numbers only)
-                if (!/^\d+$/.test(frontValue)) {
-                    showToast('O número da frente deve conter apenas dígitos', 'error');
-                    return;
-                }
-                
-                // Check if front already exists
                 if (state.fronts.includes(frontValue)) {
-                    showToast(`A Frente ${frontValue} já existe`, 'error');
+                    showToast('Esta frente já existe', 'warning');
                     return;
                 }
                 
                 // Add to fronts array
                 state.fronts.push(frontValue);
+                state.fronts.sort(); // Keep fronts sorted
                 
-                // Initialize data structures for the new front for all dates
-                for (const date in state.density) {
-                    // Initialize density, trips, delivery, potential for this date
-                    state.density[date][frontValue] = {};
-                    state.trips[date][frontValue] = {};
-                    state.delivery[date][frontValue] = {};
-                    state.potential[date][frontValue] = {};
-                    
-                    for (const hour of state.hours) {
-                        state.density[date][frontValue][hour] = 0;
-                        state.trips[date][frontValue][hour] = 0;
-                        state.delivery[date][frontValue][hour] = 0;
-                        state.potential[date][frontValue][hour] = 0;
-                    }
-                    
-                    // Initialize period summaries for this date and front
-                    for (const period in state.timePeriodsMap) {
-                        if (!state.twoHourDelivery[date][period]) {
-                            state.twoHourDelivery[date][period] = {};
-                        }
-                        if (!state.twoHourPotential[date][period]) {
-                            state.twoHourPotential[date][period] = {};
-                        }
-                        if (!state.difference[date][period]) {
-                            state.difference[date][period] = {};
-                        }
-                        
-                        state.twoHourDelivery[date][period][frontValue] = 0;
-                        state.twoHourPotential[date][period][frontValue] = 0;
-                        state.difference[date][period][frontValue] = 0;
-                    }
-                }
+                // Initialize data structures for the new front
+                initializeDataStructures();
+                
+                // Update fronts list
+                updateFrontsList();
                 
                 // Clear input
                 input.value = '';
                 
-                // Update UI
-                updateFrontsList();
+                // Regenerate time period HTML if on that page
+                if (state.currentPage === 'entrega-hora') {
+                    generateTimePeriodHTML();
+                }
                 
-                // Regenerate time period HTML to include the new front
-                generateTimePeriodHTML();
-                
-                // Update charts that display front data
-                updateCharts();
-                
-                // Update the detailed front table
-                updateDetailedFrontTable();
+                // Update charts if on dashboard
+                if (state.currentPage === 'dashboard') {
+                    updateDashboardCharts();
+                }
                 
                 showToast(`Frente ${frontValue} adicionada com sucesso`, 'success');
                 
                 // Add to history
                 addToHistory('add-front', { front: frontValue });
-                
-                // Save data
-                saveData();
             };
             
-            // Remove a front
+            // Remove front
             const removeFront = (front) => {
-                // Find the index of the front
-                const index = state.fronts.indexOf(front);
-                if (index === -1) return;
+                const frontIndex = state.fronts.indexOf(front);
+                if (frontIndex === -1) return;
                 
                 // Remove from fronts array
-                state.fronts.splice(index, 1);
+                state.fronts.splice(frontIndex, 1);
                 
-                // Remove data structures for all dates
-                for (const date in state.density) {
-                    // Remove density, trips, delivery, potential
+                // Remove all data for this front from all dates
+                Object.keys(state.density).forEach(date => {
                     if (state.density[date][front]) delete state.density[date][front];
-                    if (state.trips[date][front]) delete state.trips[date][front];
-                    if (state.delivery[date][front]) delete state.delivery[date][front];
-                    if (state.potential[date][front]) delete state.potential[date][front];
-                    
-                    // Remove from period summaries
-                    for (const period in state.timePeriodsMap) {
-                        if (state.twoHourDelivery[date]?.[period]?.[front]) {
-                            delete state.twoHourDelivery[date][period][front];
-                        }
-                        if (state.twoHourPotential[date]?.[period]?.[front]) {
-                            delete state.twoHourPotential[date][period][front];
-                        }
-                        if (state.difference[date]?.[period]?.[front]) {
-                            delete state.difference[date][period][front];
-                        }
-                    }
-                }
+                });
                 
-                // Update UI
+                Object.keys(state.trips).forEach(date => {
+                    if (state.trips[date][front]) delete state.trips[date][front];
+                });
+                
+                Object.keys(state.delivery).forEach(date => {
+                    if (state.delivery[date][front]) delete state.delivery[date][front];
+                });
+                
+                Object.keys(state.potential).forEach(date => {
+                    if (state.potential[date][front]) delete state.potential[date][front];
+                });
+                
+                Object.keys(state.twoHourDelivery).forEach(date => {
+                    Object.keys(state.twoHourDelivery[date]).forEach(period => {
+                        if (state.twoHourDelivery[date][period][front]) delete state.twoHourDelivery[date][period][front];
+                    });
+                });
+                
+                Object.keys(state.twoHourPotential).forEach(date => {
+                    Object.keys(state.twoHourPotential[date]).forEach(period => {
+                        if (state.twoHourPotential[date][period][front]) delete state.twoHourPotential[date][period][front];
+                    });
+                });
+                
+                Object.keys(state.difference).forEach(date => {
+                    Object.keys(state.difference[date]).forEach(period => {
+                        if (state.difference[date][period][front]) delete state.difference[date][period][front];
+                    });
+                });
+                
+                // Update fronts list
                 updateFrontsList();
                 
-                // Regenerate time period HTML
-                generateTimePeriodHTML();
+                // Regenerate time period HTML if on that page
+                if (state.currentPage === 'entrega-hora') {
+                    generateTimePeriodHTML();
+                }
                 
-                // Update charts
-                updateCharts();
-                
-                // Update the detailed front table
-                updateDetailedFrontTable();
+                // Update charts if on dashboard
+                if (state.currentPage === 'dashboard') {
+                    updateDashboardCharts();
+                }
                 
                 showToast(`Frente ${front} removida com sucesso`, 'success');
                 
                 // Add to history
                 addToHistory('remove-front', { front });
-                
-                // Save data
-                saveData();
-                
-                // Close modal if no fronts left
-                if (state.fronts.length === 0) {
-                    toggleModal(elements.manageFrontsModal, false);
-                }
             };
             
             // Show confirmation modal
-            const showConfirmationModal = (title, message, confirmCallback) => {
+            const showConfirmationModal = (title, message, onConfirm) => {
+                if (!elements.confirmationModal) return;
+                
                 const modalTitle = document.getElementById('modal-title');
                 const modalMessage = document.getElementById('modal-message');
                 const modalConfirm = document.getElementById('modal-confirm');
                 
-                if (modalTitle && modalMessage && modalConfirm) {
-                    modalTitle.textContent = title;
-                    modalMessage.textContent = message;
-                    
-                    // Remove previous event listener
-                    const newModalConfirm = modalConfirm.cloneNode(true);
-                    modalConfirm.parentNode.replaceChild(newModalConfirm, modalConfirm);
+                if (modalTitle) modalTitle.textContent = title;
+                if (modalMessage) modalMessage.textContent = message;
+                
+                // Remove previous event listeners
+                const newConfirmButton = modalConfirm?.cloneNode(true);
+                if (modalConfirm && newConfirmButton) {
+                    modalConfirm.parentNode?.replaceChild(newConfirmButton, modalConfirm);
                     
                     // Add new event listener
-                    newModalConfirm.addEventListener('click', function() {
-                        if (typeof confirmCallback === 'function') {
-                            confirmCallback();
-                        }
+                    newConfirmButton.addEventListener('click', () => {
+                        onConfirm();
                         toggleModal(elements.confirmationModal, false);
                     });
-                    
-                    // Show modal
-                    toggleModal(elements.confirmationModal, true);
+                }
+                
+                // Show modal with animation
+                elements.confirmationModal.classList.remove('hidden');
+                const innerModal = elements.confirmationModal.querySelector('.transform');
+                if (innerModal) {
+                    setTimeout(() => {
+                        innerModal.classList.remove('scale-95', 'opacity-0');
+                        innerModal.classList.add('scale-100', 'opacity-100');
+                    }, 10);
                 }
             };
             
             // Show toast notification
-            const showToast = (message, type = 'info') => {
+            const showToast = (message, type = 'info', duration = 4000) => {
                 if (!elements.toastContainer) return;
                 
                 const toast = document.createElement('div');
-                toast.className = `p-4 mb-3 rounded-md shadow-md transform transition-all duration-300 ease-in-out translate-x-0 opacity-100 max-w-md`;
+                toast.className = `transform transition-all duration-500 ease-in-out translate-x-full opacity-0 max-w-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`;
                 
-                let bgColor, textColor, icon;
+                const colors = {
+                    success: 'border-l-4 border-l-green-500',
+                    error: 'border-l-4 border-l-red-500',
+                    warning: 'border-l-4 border-l-yellow-500',
+                    info: 'border-l-4 border-l-blue-500'
+                };
                 
-                switch (type) {
-                    case 'success':
-                        bgColor = 'bg-success-500 dark:bg-success-600';
-                        textColor = 'text-white';
-                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>`;
-                        break;
-                    case 'error':
-                        bgColor = 'bg-danger-500 dark:bg-danger-600';
-                        textColor = 'text-white';
-                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>`;
-                        break;
-                    case 'warning':
-                        bgColor = 'bg-warning-500 dark:bg-warning-600';
-                        textColor = 'text-white';
-                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>`;
-                        break;
-                    default: // info
-                        bgColor = 'bg-primary dark:bg-primary-600';
-                        textColor = 'text-white';
-                        icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>`;
-                }
+                const icons = {
+                    success: `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                    error: `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                    warning: `<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                    info: `<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                };
                 
-                toast.className += ` ${bgColor} ${textColor}`;
+                toast.classList.add(colors[type]);
                 
                 toast.innerHTML = `
-                    <div class="flex items-center">
-                        ${icon}
-                        <span>${message}</span>
+                    <div class="p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                ${icons[type]}
+                            </div>
+                            <div class="ml-3 w-0 flex-1 pt-0.5">
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${message}</p>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 flex">
+                                <button class="close-toast bg-white dark:bg-gray-800 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <span class="sr-only">Fechar</span>
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
                 
                 elements.toastContainer.appendChild(toast);
                 
-                // Animate entry
+                // Show toast with animation
                 setTimeout(() => {
-                    toast.classList.add('translate-y-2');
-                }, 10);
+                    toast.classList.remove('translate-x-full', 'opacity-0');
+                    toast.classList.add('translate-x-0', 'opacity-100');
+                }, 100);
                 
-                // Auto-remove toast after 3 seconds
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-0', 'opacity-100');
+                // Auto remove toast
+                const removeToast = () => {
                     toast.classList.add('translate-x-full', 'opacity-0');
-                    
                     setTimeout(() => {
-                        if (toast.parentNode === elements.toastContainer) {
+                        if (toast.parentNode) {
                             elements.toastContainer.removeChild(toast);
                         }
-                    }, 300);
-                }, 3000);
+                    }, 500);
+                };
                 
-                // Add click-to-dismiss functionality
-                toast.addEventListener('click', function() {
-                    toast.classList.remove('translate-x-0', 'opacity-100');
-                    toast.classList.add('translate-x-full', 'opacity-0');
-                    
-                    setTimeout(() => {
-                        if (toast.parentNode === elements.toastContainer) {
-                            elements.toastContainer.removeChild(toast);
-                        }
-                    }, 300);
-                });
-            };
-            
-            // Generate calendar days
-            const generateCalendarDays = () => {
-                const calendarDays = document.getElementById('calendar-days');
-                const currentMonthYear = document.getElementById('current-month-year');
-                const startDateInput = document.getElementById('start-date');
-                const endDateInput = document.getElementById('end-date');
-                
-                if (!calendarDays || !currentMonthYear) return;
-                
-                // Clear previous calendar
-                calendarDays.innerHTML = '';
-                
-                // Set current month and year
-                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                currentMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
-                
-                // Get first day of month and number of days
-                const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
-                const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
-                
-                // Add empty cells for days before the first day of month
-                for (let i = 0; i < firstDay; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'h-10';
-                    calendarDays.appendChild(emptyCell);
+                // Add close button event
+                const closeButton = toast.querySelector('.close-toast');
+                if (closeButton) {
+                    closeButton.addEventListener('click', removeToast);
                 }
                 
-                // Add days
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayCell = document.createElement('div');
-                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
-                    currentDate.setHours(0, 0, 0, 0);
+                // Auto remove after duration
+                setTimeout(removeToast, duration);
+            };
+            
+            // Save data to localStorage
+            const saveData = () => {
+                try {
+                    const dataToSave = {
+                        fronts: state.fronts,
+                        currentDate: state.currentDate,
+                        availableDates: state.availableDates,
+                        density: state.density,
+                        trips: state.trips,
+                        delivery: state.delivery,
+                        potential: state.potential,
+                        twoHourDelivery: state.twoHourDelivery,
+                        twoHourPotential: state.twoHourPotential,
+                        difference: state.difference,
+                        config: state.config,
+                        lastSaved: new Date().toISOString()
+                    };
                     
-                    dayCell.className = 'calendar-day h-10 flex items-center justify-center rounded-full cursor-pointer';
-                    
-                    // Highlight current day
-                    if (currentDate.getTime() === today.getTime()) {
-                        dayCell.classList.add('current');
-                    }
-                    
-                    // Highlight selected range
-                    if (state.calendar.startDate && state.calendar.endDate) {
-                        if (currentDate.getTime() >= state.calendar.startDate.getTime() && 
-                            currentDate.getTime() <= state.calendar.endDate.getTime()) {
-                            dayCell.classList.add('selected');
-                        }
-                    }
-                    
-                    // Highlight dates with data
-                    const dateStr = currentDate.toISOString().split('T')[0];
-                    if (state.availableDates.includes(dateStr)) {
-                        dayCell.classList.add('has-data');
-                    }
-                    
-                    dayCell.textContent = day;
-                    
-                    // Add click event to select date range
-                    dayCell.addEventListener('click', function() {
-                        if (!state.calendar.startDate || (state.calendar.startDate && state.calendar.endDate)) {
-                            // Start new selection
-                            state.calendar.startDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
-                            state.calendar.endDate = null;
-                            
-                            // Update inputs
-                            if (startDateInput) startDateInput.value = formatDate(state.calendar.startDate);
-                            if (endDateInput) endDateInput.value = '';
-                        } else {
-                            // Complete selection
-                            const clickedDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
-                            
-                            // Ensure end date is after start date
-                            if (clickedDate >= state.calendar.startDate) {
-                                state.calendar.endDate = clickedDate;
-                            } else {
-                                state.calendar.endDate = state.calendar.startDate;
-                                state.calendar.startDate = clickedDate;
-                            }
-                            
-                            // Update inputs
-                            if (startDateInput) startDateInput.value = formatDate(state.calendar.startDate);
-                            if (endDateInput) endDateInput.value = formatDate(state.calendar.endDate);
-                        }
-                        
-                        // Redraw calendar to show selection
-                        generateCalendarDays();
-                    });
-                    
-                    calendarDays.appendChild(dayCell);
+                    localStorage.setItem('ggomes-log-data', JSON.stringify(dataToSave));
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar dados:', error);
+                    showToast('Erro ao salvar dados', 'error');
+                    return false;
                 }
             };
             
-            // Update history calendar
-            const updateHistoryCalendar = () => {
-                if (!elements.historyCalendar || !elements.historyMonthYear) return;
-                
-                // Clear previous calendar
-                elements.historyCalendar.innerHTML = '';
-                
-                // Set month and year display
-                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                elements.historyMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
-                
-                // Get first day of month and number of days
-                const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
-                const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
-                
-                // Add empty cells for days before the first day of month
-                for (let i = 0; i < firstDay; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'h-12';
-                    elements.historyCalendar.appendChild(emptyCell);
+            // Load data from localStorage
+            const loadData = () => {
+                try {
+                    const savedData = localStorage.getItem('ggomes-log-data');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
+                        
+                        // Restore state
+                        if (data.fronts) state.fronts = data.fronts;
+                        if (data.currentDate) state.currentDate = data.currentDate;
+                        if (data.availableDates) state.availableDates = data.availableDates;
+                        if (data.density) state.density = data.density;
+                        if (data.trips) state.trips = data.trips;
+                        if (data.delivery) state.delivery = data.delivery;
+                        if (data.potential) state.potential = data.potential;
+                        if (data.twoHourDelivery) state.twoHourDelivery = data.twoHourDelivery;
+                        if (data.twoHourPotential) state.twoHourPotential = data.twoHourPotential;
+                        if (data.difference) state.difference = data.difference;
+                        if (data.config) state.config = { ...state.config, ...data.config };
+                        
+                        console.log('Dados carregados com sucesso');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    showToast('Erro ao carregar dados salvos', 'error');
                 }
-                
-                // Add days
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayCell = document.createElement('div');
-                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
-                    currentDate.setHours(0, 0, 0, 0);
-                    const dateStr = currentDate.toISOString().split('T')[0];
-                    
-                    dayCell.className = 'h-12 flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200';
-                    
-                    // Add date number
-                    const dateSpan = document.createElement('span');
-                    dateSpan.className = 'text-sm font-medium';
-                    dateSpan.textContent = day;
-                    dayCell.appendChild(dateSpan);
-                    
-                    // Highlight current date
-                    if (dateStr === state.currentDate) {
-                        dayCell.classList.add('bg-primary/10', 'dark:bg-primary/20');
-                        dateSpan.classList.add('text-primary', 'font-bold');
-                    }
-                    
-                    // Highlight today
-                    if (currentDate.getTime() === today.getTime()) {
-                        dayCell.classList.add('border-2', 'border-primary');
-                    }
-                    
-                    // Mark dates with data
-                    if (state.availableDates.includes(dateStr)) {
-                        const dataIndicator = document.createElement('div');
-                        dataIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mt-1';
-                        dayCell.appendChild(dataIndicator);
-                    }
-                    
-                    // Set date attribute for easier access
-                    dayCell.setAttribute('data-date', dateStr);
-                    
-                    // Add click event to select date
-                    dayCell.addEventListener('click', function() {
-                        const selectedDate = this.getAttribute('data-date');
-                        if (selectedDate) {
-                            changeCurrentDate(selectedDate);
-                            updateHistoryCalendar();
-                            updateHistoryTable();
-                        }
-                    });
-                    
-                    elements.historyCalendar.appendChild(dayCell);
+                return false;
+            };
+            
+            // Save configuration
+            const saveConfig = () => {
+                try {
+                    localStorage.setItem('ggomes-log-config', JSON.stringify(state.config));
+                } catch (error) {
+                    console.error('Erro ao salvar configurações:', error);
                 }
             };
             
-            // Navigate history month
-            const navigateHistoryMonth = (direction) => {
-                state.calendar.currentMonth += direction;
-                if (state.calendar.currentMonth > 11) {
-                    state.calendar.currentMonth = 0;
-                    state.calendar.currentYear++;
-                } else if (state.calendar.currentMonth < 0) {
-                    state.calendar.currentMonth = 11;
-                    state.calendar.currentYear--;
-                }
-                
-                updateHistoryCalendar();
-            };
-            
-            // Update history table
-            const updateHistoryTable = () => {
-                if (!elements.historyTableBody || !elements.historyEmptyState) return;
-                
-                // Get selected period filter
-                const periodFilter = document.getElementById('history-period-filter')?.value || 'all';
-                
-                // Clear previous table data
-                elements.historyTableBody.innerHTML = '';
-                
-                // Get available dates (sorted from newest to oldest)
-                const dates = [...state.availableDates].sort((a, b) => {
-                    return new Date(b) - new Date(a);
-                });
-                
-                if (dates.length === 0) {
-                    // Show empty state
-                    elements.historyEmptyState.classList.remove('hidden');
-                    return;
-                }
-                
-                elements.historyEmptyState.classList.add('hidden');
-                
-                // Add row for each date
-                dates.forEach(date => {
-                    const row = document.createElement('tr');
-                    
-                    // Calculate totals for this date
-                    let totalDelivery = 0;
-                    let totalPotential = 0;
-                    let totalTrips = 0;
-                    let densitySum = 0;
-                    let densityCount = 0;
-                    
-                    // If a specific period is selected, only include that period's data
-                    if (periodFilter !== 'all') {
-                        for (const front of state.fronts) {
-                            totalDelivery += state.twoHourDelivery[date]?.[periodFilter]?.[front] || 0;
-                            totalPotential += state.twoHourPotential[date]?.[periodFilter]?.[front] || 0;
-                        }
-                        
-                        // Get hours for the selected period
-                        const hours = state.timePeriodsMap[periodFilter];
-                        
-                        // Calculate trips and density for these hours
-                        for (const front of state.fronts) {
-                            for (const hour of hours) {
-                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
-                                
-                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
-                                    densitySum += state.density[date][front][hour];
-                                    densityCount++;
-                                }
-                            }
-                        }
-                    } else {
-                        // Include all periods' data
-                        for (const period in state.timePeriodsMap) {
-                            for (const front of state.fronts) {
-                                totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
-                                totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
-                            }
-                        }
-                        
-                        // Calculate trips and density for all hours
-                        for (const front of state.fronts) {
-                            for (const hour of state.hours) {
-                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
-                                
-                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
-                                    densitySum += state.density[date][front][hour];
-                                    densityCount++;
-                                }
-                            }
-                        }
+            // Load configuration
+            const loadConfig = () => {
+                try {
+                    const savedConfig = localStorage.getItem('ggomes-log-config');
+                    if (savedConfig) {
+                        const config = JSON.parse(savedConfig);
+                        state.config = { ...state.config, ...config };
                     }
-                    
-                    // Calculate efficiency and average density
-                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
-                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
-                    
-                    // Format date for display
-                    const formattedDate = formatDateDisplay(date);
-                    
-                    // Highlight current date
-                    const isCurrentDate = date === state.currentDate;
-                    
-                    row.className = `hover:bg-gray-100 dark:hover:bg-gray-700 ${isCurrentDate ? 'bg-primary/10 dark:bg-primary/20' : ''}`;
-                    
-                    row.innerHTML = `
-                        <td class="px-4 py-3 whitespace-nowrap font-medium ${isCurrentDate ? 'text-primary' : ''}">
-                            ${formattedDate}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap font-medium text-success-600 dark:text-success-400">
-                            ${totalDelivery.toFixed(2)} ton
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            ${totalPotential.toFixed(2)} ton
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap font-medium ${getEfficiencyTextColor(efficiency)}">
-                            ${efficiency.toFixed(1)}%
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            ${totalTrips}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            ${avgDensity.toFixed(2)}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="flex space-x-2">
-                                <button class="view-date-btn text-primary hover:text-primary-600 dark:hover:text-primary-400 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Ver Data">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                </button>
-                                <button class="export-date-btn text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary" data-date="${date}" title="Exportar Data">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    
-                    elements.historyTableBody.appendChild(row);
-                });
-                
-                // Add event listeners for view and export buttons
-                document.querySelectorAll('.view-date-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const date = this.getAttribute('data-date');
-                        if (date) {
-                            changeCurrentDate(date);
-                            showPage('entrega-hora');
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.export-date-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const date = this.getAttribute('data-date');
-                        if (date) {
-                            exportDateData(date);
-                        }
-                    });
-                });
-            };
-            
-            // Export data for a specific date
-            const exportDateData = (date) => {
-                const formattedDate = formatDateDisplay(date);
-                
-                // Create PDF with date data
-                const doc = new jspdf.jsPDF();
-                
-                // Add title
-                doc.setFontSize(18);
-                doc.text(`Relatório de Entregas - ${formattedDate}`, 14, 20);
-                
-                // Add date
-                doc.setFontSize(10);
-                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
-                
-                // Define table headers
-                const headers = [['Período', 'Frente', 'Entrega', 'Potencial', 'Eficiência', 'Viagens', 'Densidade']];
-                
-                // Prepare table data
-                const data = [];
-                
-                for (const period in state.timePeriodsMap) {
-                    for (const front of state.fronts) {
-                        const twoHourDelivery = state.twoHourDelivery[date]?.[period]?.[front] || 0;
-                        const twoHourPotential = state.twoHourPotential[date]?.[period]?.[front] || 0;
-                        const efficiency = twoHourPotential > 0 ? (twoHourDelivery / twoHourPotential) * 100 : 0;
-                        
-                        // Calculate trips and density for this period
-                        const hours = state.timePeriodsMap[period];
-                        let trips = 0;
-                        let densitySum = 0;
-                        let densityCount = 0;
-                        
-                        for (const hour of hours) {
-                            trips += state.trips[date]?.[front]?.[hour] || 0;
-                            
-                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
-                                densitySum += state.density[date][front][hour];
-                                densityCount++;
-                            }
-                        }
-                        
-                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
-                        
-                        data.push([
-                            `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`,
-                            `F${front}`,
-                            twoHourDelivery.toFixed(2),
-                            twoHourPotential.toFixed(2),
-                            `${efficiency.toFixed(1)}%`,
-                            trips.toString(),
-                            avgDensity.toFixed(2)
-                        ]);
-                    }
-                }
-                
-                // Add table
-                doc.autoTable({
-                    head: headers,
-                    body: data,
-                    startY: 40,
-                    theme: 'striped',
-                    headStyles: { fillColor: [93, 92, 222] },
-                    margin: { top: 40 }
-                });
-                
-                // Save the PDF
-                doc.save(`safra-2025-relatorio-${date}.pdf`);
-                
-                showToast(`Relatório de ${formattedDate} exportado com sucesso!`, 'success');
-            };
-            
-            // Export history data
-            const exportHistoryData = () => {
-                // Create PDF with history data
-                const doc = new jspdf.jsPDF();
-                
-                // Add title
-                doc.setFontSize(18);
-                doc.text('Histórico de Entregas - Safra 2025', 14, 20);
-                
-                // Add date
-                doc.setFontSize(10);
-                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
-                
-                // Define table headers
-                const headers = [['Data', 'Total Entregue', 'Total Potencial', 'Eficiência', 'Viagens', 'Densidade Média']];
-                
-                // Get available dates (sorted from newest to oldest)
-                const dates = [...state.availableDates].sort((a, b) => {
-                    return new Date(b) - new Date(a);
-                });
-                
-                // Prepare table data
-                const data = dates.map(date => {
-                    // Calculate totals for this date
-                    let totalDelivery = 0;
-                    let totalPotential = 0;
-                    let totalTrips = 0;
-                    let densitySum = 0;
-                    let densityCount = 0;
-                    
-                    // Include all periods' data
-                    for (const period in state.timePeriodsMap) {
-                        for (const front of state.fronts) {
-                            totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
-                            totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
-                        }
-                    }
-                    
-                    // Calculate trips and density for all hours
-                    for (const front of state.fronts) {
-                        for (const hour of state.hours) {
-                            totalTrips += state.trips[date]?.[front]?.[hour] || 0;
-                            
-                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
-                                densitySum += state.density[date][front][hour];
-                                densityCount++;
-                            }
-                        }
-                    }
-                    
-                    // Calculate efficiency and average density
-                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
-                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
-                    
-                    // Format date for display
-                    const formattedDate = formatDateDisplay(date);
-                    
-                    return [
-                        formattedDate,
-                        totalDelivery.toFixed(2),
-                        totalPotential.toFixed(2),
-                        `${efficiency.toFixed(1)}%`,
-                        totalTrips.toString(),
-                        avgDensity.toFixed(2)
-                    ];
-                });
-                
-                // Add table
-                doc.autoTable({
-                    head: headers,
-                    body: data,
-                    startY: 40,
-                    theme: 'striped',
-                    headStyles: { fillColor: [93, 92, 222] },
-                    margin: { top: 40 }
-                });
-                
-                // Save the PDF
-                doc.save(`safra-2025-historico.pdf`);
-                
-                showToast('Histórico exportado com sucesso!', 'success');
-            };
-            
-            // Format date to dd/mm/yyyy
-            const formatDate = (date) => {
-                if (!date) return '';
-                return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-            };
-            
-            // Perform search
-            const performSearch = () => {
-                const searchInput = document.getElementById('global-search');
-                const searchTerm = searchInput?.value.trim().toLowerCase();
-                const searchResults = document.getElementById('search-results');
-                
-                if (!searchTerm || !searchResults) return;
-                
-                // Clear previous results
-                searchResults.innerHTML = '';
-                
-                // Search in fronts data
-                const frontResults = state.fronts.filter(front => 
-                    front.toLowerCase().includes(searchTerm)
-                );
-                
-                // Search in time periods
-                const periodResults = Object.keys(state.timePeriodsMap).filter(period => 
-                    period.includes(searchTerm) || 
-                    `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`.includes(searchTerm)
-                );
-                
-                // Search in dates
-                const dateResults = state.availableDates.filter(date => {
-                    const formattedDate = formatDateDisplay(date);
-                    return formattedDate.toLowerCase().includes(searchTerm);
-                });
-                
-                // Add results to the UI
-                let resultsCount = 0;
-                
-                // Add front results
-                if (frontResults.length > 0) {
-                    frontResults.forEach(front => {
-                        const resultItem = document.createElement('a');
-                        resultItem.href = '#';
-                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
-                        resultItem.innerHTML = `
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Frente ${front}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora > Período ${state.activePeriod}</p>
-                                </div>
-                            </div>
-                        `;
-                        
-                        resultItem.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            showPage('entrega-hora');
-                            toggleModal(elements.searchModal, false);
-                            
-                            // Focus on this front's data in the active period
-                            const frontCell = document.querySelector(`input[data-front="${front}"]`);
-                            if (frontCell) {
-                                setTimeout(() => frontCell.focus(), 100);
-                            }
-                        });
-                        
-                        searchResults.appendChild(resultItem);
-                        resultsCount++;
-                    });
-                }
-                
-                // Add period results
-                if (periodResults.length > 0) {
-                    periodResults.forEach(period => {
-                        const resultItem = document.createElement('a');
-                        resultItem.href = '#';
-                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
-                        resultItem.innerHTML = `
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-500 dark:text-green-300">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Período ${period.substring(0, 2)}:00-${period.substring(3, 5)}:00</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Entrega por Hora</p>
-                                </div>
-                            </div>
-                        `;
-                        
-                        resultItem.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            showPage('entrega-hora');
-                            switchTimePeriodTab(period);
-                            toggleModal(elements.searchModal, false);
-                        });
-                        
-                        searchResults.appendChild(resultItem);
-                        resultsCount++;
-                    });
-                }
-                
-                // Add date results
-                if (dateResults.length > 0) {
-                    dateResults.forEach(date => {
-                        const formattedDate = formatDateDisplay(date);
-                        
-                        const resultItem = document.createElement('a');
-                        resultItem.href = '#';
-                        resultItem.className = 'block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150';
-                        resultItem.innerHTML = `
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-500 dark:text-purple-300">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${formattedDate}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Histórico Diário</p>
-                                </div>
-                            </div>
-                        `;
-                        
-                        resultItem.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            changeCurrentDate(date);
-                            showPage('entrega-hora');
-                            toggleModal(elements.searchModal, false);
-                        });
-                        
-                        searchResults.appendChild(resultItem);
-                        resultsCount++;
-                    });
-                }
-                
-                // If no results found
-                if (resultsCount === 0) {
-                    const noResults = document.createElement('div');
-                    noResults.className = 'text-center py-4 text-gray-500 dark:text-gray-400';
-                    noResults.textContent = 'Nenhum resultado encontrado';
-                    searchResults.appendChild(noResults);
+                } catch (error) {
+                    console.error('Erro ao carregar configurações:', error);
                 }
             };
             
-            // Update UI configuration from form fields
+            // Update config from UI
             const updateConfigFromUI = () => {
                 const autoSaveToggle = document.getElementById('auto-save-toggle');
                 const autoSaveInterval = document.getElementById('auto-save-interval');
@@ -4959,20 +4780,44 @@
                 if (visualAlertToggle) state.config.visualAlerts = visualAlertToggle.checked;
                 
                 // Apply dark mode setting
-                updateDarkMode();
-                
-                // Update auto-save timer
-                if (autoSaveTimer) {
-                    clearInterval(autoSaveTimer);
+                if (state.config.darkMode !== document.documentElement.classList.contains('dark')) {
+                    toggleDarkMode();
                 }
                 
+                // Update auto save
                 if (state.config.autoSave) {
-                    autoSaveTimer = setInterval(saveData, state.config.autoSaveInterval * 60 * 1000);
+                    startAutoSave();
+                } else {
+                    stopAutoSave();
                 }
             };
             
-            // Update UI from configuration values
-            const updateUIFromConfig = () => {
+            // Restore default configuration
+            const restoreDefaultConfig = () => {
+                state.config = {
+                    autoSave: true,
+                    autoSaveInterval: 5,
+                    darkMode: false,
+                    alertThreshold: 10,
+                    soundAlerts: false,
+                    visualAlerts: true
+                };
+                
+                updateConfigUI();
+                saveConfig();
+                
+                // Apply settings
+                if (document.documentElement.classList.contains('dark')) {
+                    toggleDarkMode();
+                }
+                
+                startAutoSave();
+                
+                showToast('Configurações restauradas para o padrão', 'success');
+            };
+            
+            // Update config UI elements
+            const updateConfigUI = () => {
                 const autoSaveToggle = document.getElementById('auto-save-toggle');
                 const autoSaveInterval = document.getElementById('auto-save-interval');
                 const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -4986,525 +4831,595 @@
                 if (alertThreshold) alertThreshold.value = state.config.alertThreshold;
                 if (soundAlertToggle) soundAlertToggle.checked = state.config.soundAlerts;
                 if (visualAlertToggle) visualAlertToggle.checked = state.config.visualAlerts;
-                
-                // Apply dark mode setting
-                updateDarkMode();
             };
             
-            // Restore default configuration
-            const restoreDefaultConfig = () => {
-                // Reset to default values
-                state.config = {
-                    autoSave: true,
-                    autoSaveInterval: 5,
-                    darkMode: false,
-                    alertThreshold: 10,
-                    soundAlerts: false,
-                    visualAlerts: true
+            // Auto save functionality
+            const startAutoSave = () => {
+                stopAutoSave(); // Clear any existing timer
+                
+                if (state.config.autoSave) {
+                    autoSaveTimer = setInterval(() => {
+                        saveData();
+                        console.log('Auto save completed');
+                    }, state.config.autoSaveInterval * 60 * 1000); // Convert minutes to milliseconds
+                }
+            };
+            
+            const stopAutoSave = () => {
+                if (autoSaveTimer) {
+                    clearInterval(autoSaveTimer);
+                    autoSaveTimer = null;
+                }
+            };
+            
+            // History management
+            const addToHistory = (action, data) => {
+                const historyItem = {
+                    id: Date.now(),
+                    action,
+                    data,
+                    timestamp: new Date().toISOString()
                 };
                 
-                // Update UI with restored values
-                updateUIFromConfig();
+                state.history.push(historyItem);
                 
-                // Apply dark mode setting
-                updateDarkMode();
-                
-                // Save the restored config
-                saveConfig();
-                
-                showToast('Configurações restauradas para os valores padrão', 'success');
+                // Keep only last 50 actions
+                if (state.history.length > 50) {
+                    state.history = state.history.slice(-50);
+                }
             };
             
-            // Update dark mode based on config
-            const updateDarkMode = () => {
-                if (state.config.darkMode) {
-                    document.documentElement.classList.add('dark');
+            // Format date for history display
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR');
+            };
+            
+            // History calendar and table functions
+            const updateHistoryCalendar = () => {
+                if (!elements.historyCalendar) return;
+                
+                elements.historyCalendar.innerHTML = '';
+                
+                // Set current month/year for history
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                // Update month/year display
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                if (elements.historyMonthYear) {
+                    elements.historyMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+                }
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                
+                // Add empty cells for days before the first day of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'h-10';
+                    elements.historyCalendar.appendChild(emptyCell);
+                }
+                
+                // Add days
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    const currentDate = new Date(currentYear, currentMonth, day);
+                    currentDate.setHours(0, 0, 0, 0);
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    
+                    dayCell.className = 'calendar-day h-10 flex items-center justify-center rounded cursor-pointer border border-transparent hover:border-primary transition-colors';
+                    
+                    // Highlight today
+                    if (currentDate.getTime() === today.getTime()) {
+                        dayCell.classList.add('border-2', 'border-primary', 'font-bold');
+                    }
+                    
+                    // Mark dates with data
+                    if (state.availableDates.includes(dateStr)) {
+                        dayCell.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
+                    }
+                    
+                    dayCell.textContent = day;
+                    dayCell.setAttribute('data-date', dateStr);
+                    
+                    // Add click event to view day data
+                    dayCell.addEventListener('click', function() {
+                        const selectedDate = this.getAttribute('data-date');
+                        if (selectedDate && state.availableDates.includes(selectedDate)) {
+                            changeCurrentDate(selectedDate);
+                            showPage('entrega-hora');
+                        }
+                    });
+                    
+                    elements.historyCalendar.appendChild(dayCell);
+                }
+            };
+            
+            // Navigate history month
+            const navigateHistoryMonth = (direction) => {
+                // For now, this just shows the current month
+                // In a full implementation, you would track the displayed month
+                updateHistoryCalendar();
+            };
+            
+            // Update history table
+            const updateHistoryTable = () => {
+                if (!elements.historyTableBody) return;
+                
+                elements.historyTableBody.innerHTML = '';
+                
+                const periodFilter = document.getElementById('history-period-filter')?.value || 'all';
+                
+                // Get data for available dates
+                const historyData = [];
+                
+                state.availableDates.forEach(date => {
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    let totalTrips = 0;
+                    let densitySum = 0;
+                    let densityCount = 0;
+                    
+                    if (periodFilter === 'all') {
+                        // Calculate for all periods
+                        for (const period in state.timePeriodsMap) {
+                            for (const front of state.fronts) {
+                                totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                                totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                            }
+                        }
+                        
+                        for (const front of state.fronts) {
+                            for (const hour of state.hours) {
+                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                                
+                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                    densitySum += state.density[date][front][hour];
+                                    densityCount++;
+                                }
+                            }
+                        }
+                    } else {
+                        // Calculate for specific period
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[periodFilter]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[periodFilter]?.[front] || 0;
+                        }
+                        
+                        const hours = state.timePeriodsMap[periodFilter];
+                        for (const front of state.fronts) {
+                            for (const hour of hours) {
+                                totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                                
+                                if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                    densitySum += state.density[date][front][hour];
+                                    densityCount++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                    
+                    historyData.push({
+                        date,
+                        totalDelivery,
+                        totalPotential,
+                        efficiency,
+                        totalTrips,
+                        avgDensity
+                    });
+                });
+                
+                // Sort by date (most recent first)
+                historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Display data or empty state
+                if (historyData.length === 0) {
+                    elements.historyEmptyState?.classList.remove('hidden');
+                    return;
                 } else {
-                    document.documentElement.classList.remove('dark');
+                    elements.historyEmptyState?.classList.add('hidden');
                 }
                 
-                updateDarkModeToggle();
-                updateChartsTheme();
-            };
-            
-            // Save configuration to localStorage
-            const saveConfig = () => {
-                try {
-                    localStorage.setItem('safra-2025-config', JSON.stringify(state.config));
-                    return true;
-                } catch (error) {
-                    console.error('Error saving config:', error);
-                    return false;
-                }
-            };
-            
-            // Load configuration from localStorage
-            const loadConfig = () => {
-                try {
-                    const savedConfig = localStorage.getItem('safra-2025-config');
-                    if (savedConfig) {
-                        const config = JSON.parse(savedConfig);
-                        state.config = { ...state.config, ...config };
-                        
-                        // Update UI with loaded config
-                        updateUIFromConfig();
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error loading config:', error);
-                }
-                
-                return false;
-            };
-            
-            // Save data to localStorage
-            const saveData = () => {
-                try {
-                    const data = {
-                        fronts: state.fronts,
-                        availableDates: state.availableDates,
-                        density: state.density,
-                        trips: state.trips,
-                        delivery: state.delivery,
-                        potential: state.potential,
-                        twoHourDelivery: state.twoHourDelivery,
-                        twoHourPotential: state.twoHourPotential,
-                        difference: state.difference,
-                        currentDate: state.currentDate,
-                        lastSaved: new Date().toISOString()
-                    };
+                // Add rows to table
+                historyData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
                     
-                    localStorage.setItem('safra-2025-data', JSON.stringify(data));
-                    return true;
-                } catch (error) {
-                    console.error('Error saving data:', error);
-                    showToast('Erro ao salvar os dados', 'error');
-                    return false;
-                }
-            };
-            
-            // Load data from localStorage
-            const loadSavedData = () => {
-                try {
-                    const savedData = localStorage.getItem('safra-2025-data');
-                    if (savedData) {
-                        const data = JSON.parse(savedData);
-                        
-                        // Update state with saved data
-                        state.fronts = data.fronts || state.fronts;
-                        state.availableDates = data.availableDates || [];
-                        state.density = data.density || {};
-                        state.trips = data.trips || {};
-                        state.delivery = data.delivery || {};
-                        state.potential = data.potential || {};
-                        state.twoHourDelivery = data.twoHourDelivery || {};
-                        state.twoHourPotential = data.twoHourPotential || {};
-                        state.difference = data.difference || {};
-                        
-                        // Set current date from saved data or use today
-                        if (data.currentDate) {
-                            state.currentDate = data.currentDate;
-                        }
-                        
-                        // Make sure current date is properly initialized
-                        initializeDataStructures();
-                        
-                        // Update UI with loaded data
-                        updateDateDisplay();
-                        updateDateNavigationButtons();
-                        
-                        if (state.currentPage === 'entrega-hora') {
-                            generateTimePeriodHTML();
-                        }
-                        
-                        updateUI();
-                        showToast('Dados carregados com sucesso!', 'success');
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error loading data:', error);
-                    showToast('Erro ao carregar os dados salvos', 'error');
-                }
-                
-                return false;
-            };
-            
-            // Load initial test data
-            const loadInitialData = () => {
-                // Add the current date to available dates
-                if (!state.availableDates.includes(state.currentDate)) {
-                    state.availableDates.push(state.currentDate);
-                }
-                
-                // Example data for testing
-                for (const front of state.fronts) {
-                    if (!state.density[state.currentDate][front]) {
-                        state.density[state.currentDate][front] = {};
-                    }
-                    if (!state.trips[state.currentDate][front]) {
-                        state.trips[state.currentDate][front] = {};
-                    }
-                    if (!state.potential[state.currentDate][front]) {
-                        state.potential[state.currentDate][front] = {};
-                    }
+                    const efficiencyColor = getEfficiencyTextColor(row.efficiency);
                     
-                    for (const hour of state.hours) {
-                        // Generate random data for demonstration
-                        state.density[state.currentDate][front][hour] = Math.random() * 20 + 60; // Random density between 60-80
-                        state.trips[state.currentDate][front][hour] = Math.floor(Math.random() * 10); // Random trips between 0-9
-                        
-                        // Only odd hours have potential
-                        if (hour % 2 !== 0) {
-                            state.potential[state.currentDate][front][hour] = Math.floor(Math.random() * 50) + 50; // Random potential between 50-100
-                        } else {
-                            state.potential[state.currentDate][front][hour] = 0;
-                        }
-                    }
-                }
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap font-medium">${formatDateDisplay(row.date)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-success-600 dark:text-success-400">${row.totalDelivery.toFixed(2)} ton</td>
+                        <td class="px-4 py-3 whitespace-nowrap">${row.totalPotential.toFixed(2)} ton</td>
+                        <td class="px-4 py-3 whitespace-nowrap ${efficiencyColor}">${row.efficiency.toFixed(1)}%</td>
+                        <td class="px-4 py-3 whitespace-nowrap">${row.totalTrips}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">${row.avgDensity.toFixed(2)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex space-x-2">
+                                <button class="view-day-btn text-primary hover:text-primary-600 text-sm font-medium" data-date="${row.date}">
+                                    Ver
+                                </button>
+                                <button class="export-day-btn text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm" data-date="${row.date}">
+                                    Exportar
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    elements.historyTableBody.appendChild(tr);
+                });
                 
-                // Calculate delivery and two-hour totals
-                calculateDelivery();
-                calculateTwoHourTotals();
+                // Add event listeners for action buttons
+                document.querySelectorAll('.view-day-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        changeCurrentDate(date);
+                        showPage('entrega-hora');
+                    });
+                });
+                
+                document.querySelectorAll('.export-day-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const date = this.getAttribute('data-date');
+                        exportDayData(date);
+                    });
+                });
             };
             
-            // Export as JSON file
-            const exportJSON = () => {
-                const data = {
-                    date: state.currentDate,
-                    fronts: state.fronts,
-                    density: state.density[state.currentDate],
-                    trips: state.trips[state.currentDate],
-                    delivery: state.delivery[state.currentDate],
-                    potential: state.potential[state.currentDate],
-                    twoHourDelivery: state.twoHourDelivery[state.currentDate],
-                    twoHourPotential: state.twoHourPotential[state.currentDate],
-                    difference: state.difference[state.currentDate],
-                    exportDate: new Date().toISOString()
-                };
+            // Export day data
+            const exportDayData = (date) => {
+                const oldCurrentDate = state.currentDate;
+                state.currentDate = date;
                 
-                const json = JSON.stringify(data, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
+                exportJSON();
                 
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `safra-2025-data-${state.currentDate}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('Dados exportados com sucesso!', 'success');
+                state.currentDate = oldCurrentDate;
             };
             
-            // Export as CSV file
-            const exportCSV = () => {
-                let csvContent = 'data:text/csv;charset=utf-8,';
-                
-                // Headers
-                csvContent += 'Data,Frente,Hora,Densidade,Viagens,Entrega,Potencial\n';
-                
-                // Data
-                for (const front of state.fronts) {
-                    for (const hour of state.hours) {
-                        const row = [
-                            state.currentDate,
-                            front,
-                            hour,
-                            state.density[state.currentDate]?.[front]?.[hour] || 0,
-                            state.trips[state.currentDate]?.[front]?.[hour] || 0,
-                            state.delivery[state.currentDate]?.[front]?.[hour] || 0,
-                            state.potential[state.currentDate]?.[front]?.[hour] || 0
-                        ];
-                        
-                        csvContent += row.join(',') + '\n';
-                    }
-                }
-                
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement('a');
-                link.setAttribute('href', encodedUri);
-                link.setAttribute('download', `safra-2025-data-${state.currentDate}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showToast('Dados exportados com sucesso!', 'success');
-            };
-            
-            // Export as PDF file
-            const exportPDF = () => {
-                if (typeof window.jspdf === 'undefined') {
-                    showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
+            // Export history data
+            const exportHistoryData = () => {
+                if (typeof jsPDF === 'undefined') {
+                    showToast('Biblioteca jsPDF não carregada. Não é possível exportar histórico.', 'error');
                     return;
                 }
                 
-                // Create a new PDF document
-                const doc = new jspdf.jsPDF();
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
                 
                 // Add title
-                doc.setFontSize(18);
-                doc.text(`Relatório de Entrega de Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
+                doc.setFontSize(16);
+                doc.text('Histórico de Entregas - Safra 2025', 20, 20);
                 
-                // Add date
+                // Add generation info
                 doc.setFontSize(10);
-                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
-                
-                // Define table headers
-                const headers = [['Período', 'Frente', 'Densidade', 'Viagens', 'Entrega', 'Potencial', 'Eficiência']];
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 30);
                 
                 // Prepare table data
-                const data = [];
+                const tableData = [];
+                const headers = ['Data', 'Total Entregue (ton)', 'Total Previsto (ton)', 'Eficiência (%)', 'Viagens', 'Densidade Média'];
                 
-                for (const period in state.timePeriodsMap) {
-                    const hours = state.timePeriodsMap[period];
-                    const periodLabel = `${period.substring(0, 2)}:00-${period.substring(3, 5)}:00`;
+                // Get all available dates data
+                state.availableDates.forEach(date => {
+                    let totalDelivery = 0;
+                    let totalPotential = 0;
+                    let totalTrips = 0;
+                    let densitySum = 0;
+                    let densityCount = 0;
+                    
+                    // Calculate totals for this date
+                    for (const period in state.timePeriodsMap) {
+                        for (const front of state.fronts) {
+                            totalDelivery += state.twoHourDelivery[date]?.[period]?.[front] || 0;
+                            totalPotential += state.twoHourPotential[date]?.[period]?.[front] || 0;
+                        }
+                    }
                     
                     for (const front of state.fronts) {
-                        // Calculate density and trips for this period
-                        let densitySum = 0;
-                        let densityCount = 0;
-                        let trips = 0;
-                        
-                        for (const hour of hours) {
-                            if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
-                                densitySum += state.density[state.currentDate][front][hour];
+                        for (const hour of state.hours) {
+                            totalTrips += state.trips[date]?.[front]?.[hour] || 0;
+                            
+                            if ((state.density[date]?.[front]?.[hour] || 0) > 0) {
+                                densitySum += state.density[date][front][hour];
                                 densityCount++;
                             }
-                            trips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
                         }
-                        
-                        const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
-                        
-                        // Get delivery and potential for this period
-                        const delivery = state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        const potential = state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
-                        const efficiency = potential > 0 ? (delivery / potential) * 100 : 0;
-                        
-                        data.push([
-                            periodLabel,
-                            `F${front}`,
-                            avgDensity.toFixed(2),
-                            trips.toString(),
-                            delivery.toFixed(2),
-                            potential.toFixed(2),
-                            `${efficiency.toFixed(1)}%`
-                        ]);
                     }
                     
-                    // Add a blank row between periods for better readability
-                    if (Object.keys(state.timePeriodsMap).indexOf(period) < Object.keys(state.timePeriodsMap).length - 1) {
-                        data.push(['', '', '', '', '', '', '']);
-                    }
-                }
-                
-                // Add table
-                doc.autoTable({
-                    head: headers,
-                    body: data,
-                    startY: 40,
-                    theme: 'striped',
-                    headStyles: { fillColor: [93, 92, 222] },
-                    margin: { top: 40 }
+                    const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
+                    const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                    
+                    tableData.push([
+                        formatDate(date),
+                        totalDelivery.toFixed(2),
+                        totalPotential.toFixed(2),
+                        efficiency.toFixed(1) + '%',
+                        totalTrips.toString(),
+                        avgDensity.toFixed(2)
+                    ]);
                 });
                 
-                // Save the PDF
-                doc.save(`safra-2025-report-${state.currentDate}.pdf`);
+                // Add table
+                if (doc.autoTable) {
+                    doc.autoTable({
+                        head: [headers],
+                        body: tableData,
+                        startY: 40,
+                        theme: 'grid',
+                        styles: {
+                            fontSize: 8,
+                            cellPadding: 2
+                        },
+                        headStyles: {
+                            fillColor: [93, 92, 222],
+                            textColor: 255
+                        }
+                    });
+                }
                 
-                showToast('Dados exportados com sucesso!', 'success');
+                // Add footer
+                const pageHeight = doc.internal.pageSize.height;
+                doc.setFontSize(8);
+                doc.text('GGOMES-LOG - Sistema de Gestão de Entrega de Safra', 20, pageHeight - 10);
+                
+                // Save the PDF
+                doc.save(`historico-entregas-${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                showToast('Histórico exportado em PDF com sucesso!', 'success');
             };
             
-            // Export dashboard as PDF
-            const exportDashboard = () => {
-                if (typeof window.jspdf === 'undefined') {
-                    showToast('Biblioteca jsPDF não encontrada. Não é possível exportar para PDF.', 'error');
+            // Perform search
+            const performSearch = () => {
+                const searchInput = document.getElementById('global-search');
+                if (!searchInput) return;
+                
+                const query = searchInput.value.trim().toLowerCase();
+                if (!query) {
+                    showToast('Digite algo para pesquisar', 'warning');
                     return;
                 }
                 
-                // Create a new PDF document
-                const doc = new jspdf.jsPDF();
+                // Simple search implementation
+                // In a real app, this would be more sophisticated
                 
-                // Add title
-                doc.setFontSize(18);
-                doc.text(`Dashboard de Desempenho - Safra 2025 - ${formatDateDisplay(state.currentDate)}`, 14, 20);
+                let found = false;
                 
-                // Add date
-                doc.setFontSize(10);
-                doc.text(`Exportado em: ${formatDateDisplay(new Date().toISOString().split('T')[0])}`, 14, 30);
-                
-                // Add summary table
-                const summaryHeaders = [['Métrica', 'Valor']];
-                
-                // Calculate summary data for current date
-                const totalDelivery = Object.keys(state.twoHourDelivery[state.currentDate] || {}).reduce((periodSum, period) => {
-                    return periodSum + Object.keys(state.twoHourDelivery[state.currentDate][period] || {}).reduce((frontSum, front) => {
-                        return frontSum + (state.twoHourDelivery[state.currentDate][period][front] || 0);
-                    }, 0);
-                }, 0);
-                
-                const totalPotential = Object.keys(state.twoHourPotential[state.currentDate] || {}).reduce((periodSum, period) => {
-                    return periodSum + Object.keys(state.twoHourPotential[state.currentDate][period] || {}).reduce((frontSum, front) => {
-                        return frontSum + (state.twoHourPotential[state.currentDate][period][front] || 0);
-                    }, 0);
-                }, 0);
-                
-                const efficiency = totalPotential > 0 ? (totalDelivery / totalPotential) * 100 : 0;
-                
-                const totalTrips = Object.keys(state.trips[state.currentDate] || {}).reduce((frontSum, front) => {
-                    return frontSum + Object.keys(state.trips[state.currentDate][front] || {}).reduce((hourSum, hour) => {
-                        return hourSum + (state.trips[state.currentDate][front][hour] || 0);
-                    }, 0);
-                }, 0);
-                
-                // Calculate average density
-                let densitySum = 0;
-                let densityCount = 0;
-                
-                for (const front in state.density[state.currentDate] || {}) {
-                    for (const hour in state.density[state.currentDate][front] || {}) {
-                        if ((state.density[state.currentDate][front][hour] || 0) > 0) {
-                            densitySum += state.density[state.currentDate][front][hour];
-                            densityCount++;
-                        }
+                // Search in fronts
+                if (query.includes('frente') || query.match(/\d{4}/)) {
+                    const frontMatch = query.match(/\d{4}/);
+                    if (frontMatch && state.fronts.includes(frontMatch[0])) {
+                        showPage('entrega-hora');
+                        found = true;
                     }
                 }
                 
-                const avgDensity = densityCount > 0 ? densitySum / densityCount : 0;
+                // Search in periods
+                const periodMatches = {
+                    '06': '06-08', '08': '08-10', '10': '10-12', '12': '12-14',
+                    '14': '14-16', '16': '16-18', '18': '18-20', '20': '20-22',
+                    '22': '22-00', '00': '00-02', '02': '02-04', '04': '04-06'
+                };
                 
-                // Create summary data array
-                const summaryData = [
-                    ['Total Entregue', `${totalDelivery.toFixed(2)} ton`],
-                    ['Total Potencial', `${totalPotential.toFixed(2)} ton`],
-                    ['Eficiência', `${efficiency.toFixed(1)}%`],
-                    ['Total de Viagens', totalTrips.toString()],
-                    ['Densidade Média', avgDensity.toFixed(2)]
-                ];
-                
-                // Add summary table
-                doc.autoTable({
-                    head: summaryHeaders,
-                    body: summaryData,
-                    startY: 40,
-                    theme: 'striped',
-                    headStyles: { fillColor: [93, 92, 222] },
-                    margin: { top: 40 }
-                });
-                
-                // Add detailed data by front
-                const frontHeaders = [['Frente', 'Total Entregue', 'Total Previsto', 'Eficiência', 'Viagens', 'Densidade Média']];
-                const frontData = [];
-                
-                for (const front of state.fronts) {
-                    // Calculate front total delivery
-                    let frontDelivery = 0;
-                    let frontPotential = 0;
-                    let frontTrips = 0;
-                    let frontDensitySum = 0;
-                    let frontDensityCount = 0;
-                    
-                    // Calculate totals across all periods
-                    for (const period in state.timePeriodsMap) {
-                        frontDelivery += state.twoHourDelivery[state.currentDate]?.[period]?.[front] || 0;
-                        frontPotential += state.twoHourPotential[state.currentDate]?.[period]?.[front] || 0;
+                for (const [hour, period] of Object.entries(periodMatches)) {
+                    if (query.includes(hour)) {
+                        showPage('entrega-hora');
+                        switchTimePeriodTab(period);
+                        found = true;
+                        break;
                     }
+                }
+                
+                // Search for dashboard
+                if (query.includes('dashboard') || query.includes('resumo') || query.includes('visão geral')) {
+                    showPage('dashboard');
+                    found = true;
+                }
+                
+                // Search for reports
+                if (query.includes('relatório') || query.includes('análise')) {
+                    showPage('relatorios');
+                    found = true;
+                }
+                
+                // Search for history
+                if (query.includes('histórico') || query.includes('anterior')) {
+                    showPage('historico');
+                    found = true;
+                }
+                
+                if (found) {
+                    toggleModal(elements.searchModal, false);
+                    showToast('Resultado da pesquisa exibido', 'success');
+                } else {
+                    showToast('Nenhum resultado encontrado para "' + query + '"', 'info');
+                }
+            };
+            
+            // Generate calendar days for date range picker
+            const generateCalendarDays = () => {
+                const calendarDays = document.getElementById('calendar-days');
+                if (!calendarDays) return;
+                
+                calendarDays.innerHTML = '';
+                
+                // Update month/year display
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const currentMonthYear = document.getElementById('current-month-year');
+                if (currentMonthYear) {
+                    currentMonthYear.textContent = `${monthNames[state.calendar.currentMonth]} ${state.calendar.currentYear}`;
+                }
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
+                const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
+                
+                // Add empty cells for days before the first day of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'h-10';
+                    calendarDays.appendChild(emptyCell);
+                }
+                
+                // Add days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    const currentDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
                     
-                    // Calculate trips and density
-                    for (const hour of state.hours) {
-                        frontTrips += state.trips[state.currentDate]?.[front]?.[hour] || 0;
+                    dayCell.className = 'calendar-day h-10 flex items-center justify-center rounded cursor-pointer hover:bg-primary/10 transition-colors';
+                    dayCell.textContent = day;
+                    
+                    // Handle date selection for range
+                    dayCell.addEventListener('click', function() {
+                        const selectedDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
                         
-                        if ((state.density[state.currentDate]?.[front]?.[hour] || 0) > 0) {
-                            frontDensitySum += state.density[state.currentDate][front][hour];
-                            frontDensityCount++;
+                        if (!state.calendar.startDate || (state.calendar.startDate && state.calendar.endDate)) {
+                            // Start new selection
+                            state.calendar.startDate = selectedDate;
+                            state.calendar.endDate = null;
+                        } else if (selectedDate >= state.calendar.startDate) {
+                            // Set end date
+                            state.calendar.endDate = selectedDate;
+                        } else {
+                            // Selected date is before start date, make it the new start
+                            state.calendar.endDate = state.calendar.startDate;
+                            state.calendar.startDate = selectedDate;
                         }
-                    }
+                        
+                        updateDateInputs();
+                        highlightSelectedRange();
+                    });
                     
-                    // Calculate average density
-                    const frontAvgDensity = frontDensityCount > 0 ? frontDensitySum / frontDensityCount : 0;
-                    
-                    // Calculate efficiency
-                    const frontEfficiency = frontPotential > 0 ? (frontDelivery / frontPotential) * 100 : 0;
-                    
-                    frontData.push([
-                        `F${front}`,
-                        `${frontDelivery.toFixed(2)} ton`,
-                        `${frontPotential.toFixed(2)} ton`,
-                        `${frontEfficiency.toFixed(1)}%`,
-                        frontTrips.toString(),
-                        frontAvgDensity.toFixed(2)
-                    ]);
+                    calendarDays.appendChild(dayCell);
                 }
                 
-                // Add front data table
-                doc.autoTable({
-                    head: frontHeaders,
-                    body: frontData,
-                    startY: doc.lastAutoTable.finalY + 10,
-                    theme: 'striped',
-                    headStyles: { fillColor: [93, 92, 222] }
+                highlightSelectedRange();
+            };
+            
+            // Update date inputs in calendar modal
+            const updateDateInputs = () => {
+                const startDateInput = document.getElementById('start-date');
+                const endDateInput = document.getElementById('end-date');
+                
+                if (startDateInput && state.calendar.startDate) {
+                    startDateInput.value = formatDate(state.calendar.startDate.toISOString().split('T')[0]);
+                }
+                
+                if (endDateInput && state.calendar.endDate) {
+                    endDateInput.value = formatDate(state.calendar.endDate.toISOString().split('T')[0]);
+                }
+            };
+            
+            // Highlight selected date range
+            const highlightSelectedRange = () => {
+                const dayElements = document.querySelectorAll('.calendar-day');
+                
+                dayElements.forEach(dayEl => {
+                    const day = parseInt(dayEl.textContent);
+                    const dayDate = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+                    
+                    // Remove previous styling
+                    dayEl.classList.remove('bg-primary', 'text-white', 'bg-primary/20');
+                    
+                    if (state.calendar.startDate && dayDate.getTime() === state.calendar.startDate.getTime()) {
+                        dayEl.classList.add('bg-primary', 'text-white');
+                    } else if (state.calendar.endDate && dayDate.getTime() === state.calendar.endDate.getTime()) {
+                        dayEl.classList.add('bg-primary', 'text-white');
+                    } else if (state.calendar.startDate && state.calendar.endDate && 
+                               dayDate > state.calendar.startDate && dayDate < state.calendar.endDate) {
+                        dayEl.classList.add('bg-primary/20');
+                    }
                 });
-                
-                // Save the PDF
-                doc.save(`safra-2025-dashboard-${state.currentDate}.pdf`);
-                
-                showToast('Dashboard exportado com sucesso!', 'success');
             };
             
             // Initialize the application
             const init = () => {
-                // Initialize data structures
-                initializeDataStructures();
-                
                 // Cache DOM elements
                 cacheElements();
                 
-                // Load configuration
+                // Load configuration and data
                 loadConfig();
+                const dataLoaded = loadData();
                 
-                // Setup dark mode
-                updateDarkMode();
-                
-                // Load initial test data (or real data if available)
-                if (!loadSavedData()) {
-                    loadInitialData();
-                }
+                // Initialize data structures
+                initializeDataStructures();
                 
                 // Setup event listeners
                 setupEventListeners();
                 
-                // Initialize charts
-                initializeCharts();
+                // Initialize UI
+                updateDateDisplay();
+                updateDateNavigationButtons();
+                updateDarkModeToggle();
+                updateConfigUI();
                 
-                // Show default page (dashboard)
+                // Initialize charts after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    initializeCharts();
+                }, 100);
+                
+                // Show initial page
                 showPage('dashboard');
                 
-                // Set up auto-save interval
+                // Start auto save if enabled
                 if (state.config.autoSave) {
-                    autoSaveTimer = setInterval(saveData, state.config.autoSaveInterval * 60 * 1000);
+                    startAutoSave();
                 }
                 
-                // Update date display
-                updateDateDisplay();
+                // Show welcome message
+                if (!dataLoaded) {
+                    showToast('Bem-vindo ao GGOMES-LOG! Sistema iniciado com sucesso.', 'success', 5000);
+                } else {
+                    showToast('Dados carregados com sucesso!', 'success');
+                }
                 
-                // Update date navigation buttons
-                updateDateNavigationButtons();
+                // Apply dark mode from system preference if not set by user
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('ggomes-log-config')) {
+                    document.documentElement.classList.add('dark');
+                    state.config.darkMode = true;
+                    updateDarkModeToggle();
+                    updateChartsTheme();
+                }
                 
-                // Setup periodic updates
-                setInterval(updateDateDisplay, 60000); // Update every minute
+                console.log('GGOMES-LOG initialized successfully');
             };
             
+            // Public API
             return {
-                init
+                init,
+                showPage,
+                saveData,
+                loadData,
+                showToast,
+                // Expose some utilities for debugging
+                state: () => state,
+                elements: () => elements
             };
         })();
         
-        // Initialize the application
+        // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for dark mode preference
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
-            }
-            
-            // Initialize app
             App.init();
+        });
+        
+        // Handle page visibility for auto-save
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                // Page is being hidden, save data
+                App.saveData();
+            }
+        });
+        
+        // Handle beforeunload for data saving
+        window.addEventListener('beforeunload', function(e) {
+            App.saveData();
         });
     </script>
 </body>
